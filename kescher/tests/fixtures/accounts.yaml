@@ -1,0 +1,17 @@
+Debitoren:
+  - "1000"
+  - "1001"
+  - "1002"
+Verbindlichkeiten:
+  - Ust
+Aufwendungen:
+  - Internet
+  - Strom
+  - Miete
+  - Telefon
+  - Anschaffungen:
+    - Kundenhardware
+    - Zentralhardware
+    - Verbrauchsmaterialien
+Erträge:
+  - Internetanschlüsse

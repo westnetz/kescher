@@ -1,0 +1,16 @@
+# Dev Files
+.coverage
+__pycache__
+*.egg-info/*
+*.py{c,o}
+*.swp
+
+# Fixtures
+accounts.yaml
+!/kescher/tests/fixtures/accounts.yaml
+./journal.csv
+!/kescher/tests/fixtures/journal.csv
+
+# Working dir files
+kescher.log
+kescher.db
