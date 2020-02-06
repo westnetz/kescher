@@ -26,7 +26,7 @@ def test_init_debug_writes_to_log():
         assert "kescher - DEBUG - Debug mode is on" in log_content
 
 
-def test_load_accounts():
+def test_import_accounts():
     runner = CliRunner()
     result = runner.invoke(cli, ["import-accounts", ACCOUNTS_FILE])
     assert result.exit_code == 0
