@@ -6,6 +6,7 @@ help:
 
 .PHONY: test
 test: ## Run software tests
+	rm -f kescher.log kescher.db
 	pytest -v kescher --cov=./ --cov-report term-missing:skip-covered $(PYTEST_ARGS)
 
 .PHONY: black

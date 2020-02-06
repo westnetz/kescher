@@ -15,6 +15,7 @@ from peewee import (
     TextField,
 )
 
+
 class BaseModel(Model):
 
     updated_at = DateTimeField(null=True)
