@@ -1,6 +1,7 @@
 import arrow
 import hashlib
 
+from kescher.database import get_db
 from pathlib import Path
 from peewee import (
     BooleanField,
@@ -11,19 +12,15 @@ from peewee import (
     Field,
     ForeignKeyField,
     Model,
-    SqliteDatabase,
     TextField,
 )
-
-db = SqliteDatabase("kescher.db")
-
 
 class BaseModel(Model):
 
     updated_at = DateTimeField(null=True)
 
     class Meta:
-        database = db
+        database = get_db()
 
     def save(self, *args, **kwargs):
         self.updated_at = arrow.now().datetime
@@ -98,7 +95,7 @@ class VirtualAccountEntry(BaseModel):
 
 
 def create_tables():
-    with db as database:
+    with get_db() as database:
         database.create_tables(
             [Document, JournalEntry, Account, AccountEntry, VirtualAccountEntry]
         )

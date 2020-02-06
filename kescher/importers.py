@@ -11,7 +11,8 @@ import csv
 import logging
 import yaml
 
-from kescher.models import JournalEntry, Account, Document, db
+from kescher.database import get_db
+from kescher.models import JournalEntry, Account, Document
 from pathlib import Path
 from pdfminer.high_level import extract_text
 from peewee import DoesNotExist
@@ -55,7 +56,7 @@ class CsvImporter(Importer):
         after all lines were read sucessfully, the objects are saved.
         """
         n_rows = 0
-        with db.atomic():
+        with get_db().atomic() as db:
             for row in tqdm(self.reader):
                 self.logger.debug("Creating: " + ", ".join(row))
                 JournalEntry.create(
@@ -89,7 +90,7 @@ class AccountImporter(Importer):
         self.account_file = account_file
         self.n_accounts = 0
         super().__init__()
-        self.db = db.connection()
+        self.db = get_db().connection()
 
     def __call__(self):
         """
@@ -164,7 +165,7 @@ class DocumentImporter(Importer):
         self.import_documents()
 
     def import_documents(self):
-        with db:
+        with get_db() as db:
             for doc_path in self.path.glob(self.EXTENSION):
                 exists = True
                 doc_hash = Document.make_hash(doc_path)
