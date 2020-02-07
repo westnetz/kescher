@@ -13,8 +13,12 @@ logger = setup_logging(cwd)
 
 
 @click.group()
-@click.option("--debug/--no-debug", default=False)
+@click.option("--debug/--no-debug", default=False, help="Activate/Deactive verbose logging.")
 def cli(debug):
+    """
+    kescher cli allows you to bulk import invoices, journals, accounts and documents. Furthermore
+    you can use various reporting functions to get a quick overview over your accounts.
+    """
     if debug:
         logger.setLevel(logging.DEBUG)
     logger.debug("Debug mode is on")
@@ -23,6 +27,9 @@ def cli(debug):
 @cli.command()
 @click.argument("journal_file", type=click.File("r"))
 def import_journal(journal_file):
+    """
+    Import journal entries from csv.
+    """
     print(f"Importing CSV journal {journal_file.name}...")
     JournalImporter(journal_file)()
 
@@ -30,6 +37,9 @@ def import_journal(journal_file):
 @cli.command()
 @click.argument("account_file", type=click.File("r"))
 def import_accounts(account_file):
+    """
+    Bulk import accounts from yaml file.
+    """
     print(f"Importing accounts from file {account_file.name}...")
     AccountImporter(account_file)()
 
@@ -37,23 +47,29 @@ def import_accounts(account_file):
 @cli.command()
 @click.argument("path", type=click.Path(exists=True))
 def import_documents(path):
+    """
+    Bulk import pdf documents.
+    """
     print(f"Importing documents from {path}...")
     DocumentImporter(path)()
 
-
 @cli.command()
-def annotate():
-    print("Annotating...")
-    je = JournalEntry.get(JournalEntry.id == 1)
-    je.save()
-
-
-@cli.command()
-def export():
-    print("Exporting...")
+@click.option("--flat/--nested", default=False, help="Invoices in subdirectories?")
+@click.argument("path", type=click.Path(exists=True))
+@click.argument("account_key")
+@click.argument("amount_key")
+def import_invoices(flat, path, account_key, amount_key):
+    """
+    Bulk import yaml invoices. 
+    """
+    print(f"Import invoices from {path}...")
+    InvoiceImporter(path, account_key, amount_key, flat)()
 
 
 @cli.command()
 def init():
+    """
+    Create the database in the current working directory.
+    """
     print("Setting up database and directories...")
     create_tables()
