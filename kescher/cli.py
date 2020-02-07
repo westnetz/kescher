@@ -21,10 +21,10 @@ def cli(debug):
 
 
 @cli.command()
-@click.argument("csv_file", type=click.File("r"))
-def import_journal(csv_file):
-    print(f"Importing CSV file {csv_file.name}...")
-    JournalImporter(csv_file)()
+@click.argument("journal_file", type=click.File("r"))
+def import_journal(journal_file):
+    print(f"Importing CSV journal {journal_file.name}...")
+    JournalImporter(journal_file)()
 
 
 @cli.command()
