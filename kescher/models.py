@@ -39,6 +39,9 @@ class PathField(Field):
 
 
 class Document(BaseModel):
+    """
+    A Document is an invoice/receipt which reasons a JournalEntry.
+    """
     content = TextField()
     path = CharField(unique=True)
     hash = CharField()
@@ -55,6 +58,9 @@ class Document(BaseModel):
 
 
 class JournalEntry(BaseModel):
+    """
+    A JournalEntry is one row (line) in your imported journal (bank statement).
+    """
     date = DateField()
     sender = CharField()
     receiver = CharField()
@@ -66,6 +72,9 @@ class JournalEntry(BaseModel):
 
 
 class Account(BaseModel):
+    """
+    Accounts are used to structure bookings e.g. by type, customer, etc.
+    """
     name = CharField()
     parent = ForeignKeyField("self", null=True, backref="children")
 
@@ -73,9 +82,9 @@ class Account(BaseModel):
         return self.name
 
 
-class AccountEntry(BaseModel):
+class Booking(BaseModel):
     """
-    An account contains a part or the whole value of the referenced journalentry.
+    A booking references a (partial) amount of a JournalEntry to an Account.
     """
 
     account = ForeignKeyField(Account, backref="account_entries")
@@ -83,7 +92,7 @@ class AccountEntry(BaseModel):
     value = DecimalField()
 
 
-class VirtualAccountEntry(BaseModel):
+class VirtualBooking(BaseModel):
     """
     To allow for cash accounting, all invoices are to be created as virtual 
     account entries.
@@ -98,5 +107,5 @@ class VirtualAccountEntry(BaseModel):
 def create_tables():
     with get_db() as database:
         database.create_tables(
-            [Document, JournalEntry, Account, AccountEntry, VirtualAccountEntry]
+            [Document, JournalEntry, Account, Booking, VirtualBooking]
         )

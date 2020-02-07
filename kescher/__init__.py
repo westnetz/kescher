@@ -1,8 +1,8 @@
 from kescher.importers import AccountImporter, DocumentImporter, JournalImporter
 from kescher.models import (
     Account,
-    AccountEntry,
+    Booking,
     JournalEntry,
     Document,
-    VirtualAccountEntry,
+    VirtualBooking,
 )
