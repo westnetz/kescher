@@ -12,7 +12,7 @@ import logging
 import yaml
 
 from kescher.database import get_db
-from kescher.models import JournalEntry, Account, Document
+from kescher.models import Account, Document, JournalEntry, VirtualBooking
 from pathlib import Path
 from pdfminer.high_level import extract_text
 from peewee import DoesNotExist
@@ -194,3 +194,52 @@ class DocumentImporter(Importer):
                             f"Hash {doc_hash} of doc to be imported matches hash in db."
                         )
         self.logger.info(f"Imported {self.n_new_documents} new documents.")
+
+
+class InvoiceImporter(Importer):
+
+    EXTENSION = "*.yaml"
+
+    def __init__(self, path, account_key, amount_key, date_key, flat=False):
+        if not isinstance(path, Path):
+            path = Path(path)
+        self.path = path
+        self.flat = flat
+        self.account_key = account_key
+        self.amount_key = amount_key
+        self.date_key = date_key
+        super().__init__()
+
+    def __call__(self):
+        self.import_invoices()
+
+    def import_invoices(self):
+        self.logger.debug(f"Importing invoices from {self.path}.")
+        if self.flat:
+            invoice_iterator = self._iterate_flat_invoices
+        else:
+            invoice_iterator = self._iterate_nested_invoices
+        with get_db().atomic() as db:
+            for invoice in invoice_iterator():
+                self.logger.debug(f"Importing invoice {invoice['id']}...")
+                account, created = Account.get_or_create(name=str(invoice[self.account_key]))
+                if created:
+                    self.logger.debug(f"Created new account {account}...")
+                VirtualBooking.create(
+                    account_id = account.id,
+                    value = invoice[self.amount_key],
+                    date = arrow.get(invoice[self.date_key], "DD.MM.YYYY").datetime
+                )
+
+    def _iterate_flat_invoices(self):
+        yield from self._iterate_invoices(self.path)
+
+    def _iterate_nested_invoices(self):
+        for invoice_dir in self.path.glob("*"):
+            if invoice_dir.is_dir():
+                yield from self._iterate_invoices(invoice_dir)
+
+    def _iterate_invoices(self, path):
+        for invoice in path.glob(self.EXTENSION):
+            with open(invoice) as infile:
+                yield yaml.safe_load(infile)

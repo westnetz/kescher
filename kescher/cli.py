@@ -3,7 +3,12 @@
 import click
 import logging
 
-from kescher.importers import AccountImporter, DocumentImporter, JournalImporter
+from kescher.importers import (
+    AccountImporter,
+    DocumentImporter,
+    InvoiceImporter,
+    JournalImporter,
+)
 from kescher.logging import setup_logging
 from kescher.models import create_tables, JournalEntry
 from pathlib import Path
@@ -13,7 +18,9 @@ logger = setup_logging(cwd)
 
 
 @click.group()
-@click.option("--debug/--no-debug", default=False, help="Activate/Deactive verbose logging.")
+@click.option(
+    "--debug/--no-debug", default=False, help="Activate/Deactive verbose logging."
+)
 def cli(debug):
     """
     kescher cli allows you to bulk import invoices, journals, accounts and documents. Furthermore
@@ -53,17 +60,19 @@ def import_documents(path):
     print(f"Importing documents from {path}...")
     DocumentImporter(path)()
 
+
 @cli.command()
 @click.option("--flat/--nested", default=False, help="Invoices in subdirectories?")
 @click.argument("path", type=click.Path(exists=True))
 @click.argument("account_key")
 @click.argument("amount_key")
-def import_invoices(flat, path, account_key, amount_key):
+@click.argument("date_key")
+def import_invoices(flat, path, account_key, amount_key, date_key):
     """
     Bulk import yaml invoices. 
     """
     print(f"Import invoices from {path}...")
-    InvoiceImporter(path, account_key, amount_key, flat)()
+    InvoiceImporter(path, account_key, amount_key, date_key, flat)()
 
 
 @cli.command()

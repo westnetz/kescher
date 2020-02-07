@@ -42,6 +42,7 @@ class Document(BaseModel):
     """
     A Document is an invoice/receipt which reasons a JournalEntry.
     """
+
     content = TextField()
     path = CharField(unique=True)
     hash = CharField()
@@ -61,6 +62,7 @@ class JournalEntry(BaseModel):
     """
     A JournalEntry is one row (line) in your imported journal (bank statement).
     """
+
     date = DateField()
     sender = CharField()
     receiver = CharField()
@@ -75,6 +77,7 @@ class Account(BaseModel):
     """
     Accounts are used to structure bookings e.g. by type, customer, etc.
     """
+
     name = CharField()
     parent = ForeignKeyField("self", null=True, backref="children")
 
