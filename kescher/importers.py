@@ -213,7 +213,6 @@ class DocumentImporter(Importer):
         self.logger.info(f"Imported {self.n_new_documents} new documents.")
 
 
-
 class InvoiceImporter(Importer):
 
     EXTENSION = ".yaml"
@@ -244,15 +243,19 @@ class InvoiceImporter(Importer):
             for invoice_path in invoice_iterator():
                 with open(invoice_path) as infile:
                     invoice = yaml.safe_load(infile)
-                document = Document.get_or_none(Document.path ==
-                        invoice_path.with_suffix(DocumentImporter.EXTENSION))
+                document = Document.get_or_none(
+                    Document.path
+                    == invoice_path.with_suffix(DocumentImporter.EXTENSION)
+                )
                 self.logger.debug(f"Importing invoice {invoice['id']}...")
-                account, created = Account.get_or_create(name=str(invoice[self.account_key]))
+                account, created = Account.get_or_create(
+                    name=str(invoice[self.account_key])
+                )
                 if created:
                     self.logger.debug(f"Created new account {account}...")
                 VirtualBooking.create(
-                    account_id = account.id,
-                    document_id = document.id,
-                    value = invoice[self.amount_key],
-                    date = arrow.get(invoice[self.date_key], "DD.MM.YYYY").datetime
+                    account_id=account.id,
+                    document_id=document.id,
+                    value=invoice[self.amount_key],
+                    date=arrow.get(invoice[self.date_key], "DD.MM.YYYY").datetime,
                 )
