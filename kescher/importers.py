@@ -34,6 +34,18 @@ class Importer:
         self.import_date = arrow.now()
         self.logger = logging.getLogger("kescher.importer." + self.__class__.__name__)
 
+    def _iterate_flat(self):
+        yield from self._iterate(self.path)
+
+    def _iterate_nested(self):
+        for nested_dir in self.path.glob("*"):
+            if nested_dir.is_dir():
+                yield from self._iterate(nested_dir)
+
+    def _iterate(self, path):
+        for item in path.glob(f"*{self.EXTENSION}"):
+            yield item
+
 
 class JournalImporter(Importer):
     def __init__(self, csv_file, delimiter=";", quotechar='"'):
@@ -152,21 +164,26 @@ class DocumentImporter(Importer):
     The DocumentImporter assists for bulk importing documents.
     """
 
-    EXTENSION = "*.pdf"
+    EXTENSION = ".pdf"
 
-    def __init__(self, path):
+    def __init__(self, path, flat=True):
         self.n_new_documents = 0
         if not isinstance(path, Path):
             path = Path(path)
         self.path = path
+        self.flat = flat
         super().__init__()
 
     def __call__(self):
         self.import_documents()
 
     def import_documents(self):
+        if self.flat:
+            doc_iterator = self._iterate_flat
+        else:
+            doc_iterator = self._iterate_nested
         with get_db() as db:
-            for doc_path in self.path.glob(self.EXTENSION):
+            for doc_path in doc_iterator():
                 exists = True
                 doc_hash = Document.make_hash(doc_path)
                 self.logger.debug(f"Importing {doc_path} ({doc_hash}).")
@@ -196,9 +213,10 @@ class DocumentImporter(Importer):
         self.logger.info(f"Imported {self.n_new_documents} new documents.")
 
 
+
 class InvoiceImporter(Importer):
 
-    EXTENSION = "*.yaml"
+    EXTENSION = ".yaml"
 
     def __init__(self, path, account_key, amount_key, date_key, flat=False):
         if not isinstance(path, Path):
@@ -215,31 +233,26 @@ class InvoiceImporter(Importer):
 
     def import_invoices(self):
         self.logger.debug(f"Importing invoices from {self.path}.")
+        # First we need to import the Documents
+        DocumentImporter(self.path, self.flat)()
+
         if self.flat:
-            invoice_iterator = self._iterate_flat_invoices
+            invoice_iterator = self._iterate_flat
         else:
-            invoice_iterator = self._iterate_nested_invoices
+            invoice_iterator = self._iterate_nested
         with get_db().atomic() as db:
-            for invoice in invoice_iterator():
+            for invoice_path in invoice_iterator():
+                with open(invoice_path) as infile:
+                    invoice = yaml.safe_load(infile)
+                document = Document.get_or_none(Document.path ==
+                        invoice_path.with_suffix(DocumentImporter.EXTENSION))
                 self.logger.debug(f"Importing invoice {invoice['id']}...")
                 account, created = Account.get_or_create(name=str(invoice[self.account_key]))
                 if created:
                     self.logger.debug(f"Created new account {account}...")
                 VirtualBooking.create(
                     account_id = account.id,
+                    document_id = document.id,
                     value = invoice[self.amount_key],
                     date = arrow.get(invoice[self.date_key], "DD.MM.YYYY").datetime
                 )
-
-    def _iterate_flat_invoices(self):
-        yield from self._iterate_invoices(self.path)
-
-    def _iterate_nested_invoices(self):
-        for invoice_dir in self.path.glob("*"):
-            if invoice_dir.is_dir():
-                yield from self._iterate_invoices(invoice_dir)
-
-    def _iterate_invoices(self, path):
-        for invoice in path.glob(self.EXTENSION):
-            with open(invoice) as infile:
-                yield yaml.safe_load(infile)
