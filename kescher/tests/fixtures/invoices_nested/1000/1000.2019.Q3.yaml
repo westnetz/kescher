@@ -1,0 +1,29 @@
+address:
+- Westnetz w.V.
+- Karl-Heine-Str. 93
+- 04229 Leipzig
+cid: '1000'
+date: 08.12.2019
+id: 1000.2019.Q3
+items:
+- description: Internet Juli 2019
+  item: 1
+  price: 20.0
+  quantity: 1
+  subtotal: 20.0
+- description: Internet August 2019
+  item: 2
+  price: 20.0
+  quantity: 1
+  subtotal: 20.0
+- description: Internet September 2019
+  item: 3
+  price: 20.0
+  quantity: 1
+  subtotal: 20.0
+period: 1.7.2019 - 30.9.2019
+sent: true
+total_gross: 60.0
+total_net: 50.42
+total_vat: 9.58
+vat: 19
