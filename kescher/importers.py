@@ -35,7 +35,7 @@ class Importer:
         self.logger = logging.getLogger("kescher.importer." + self.__class__.__name__)
 
 
-class CsvImporter(Importer):
+class JournalImporter(Importer):
     def __init__(self, csv_file, delimiter=";", quotechar='"'):
         """
         Must be given a csv file handler (and optionally delimiter and quotechar).

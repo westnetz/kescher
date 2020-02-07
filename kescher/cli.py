@@ -3,7 +3,7 @@
 import click
 import logging
 
-from kescher.importers import CsvImporter, AccountImporter, DocumentImporter
+from kescher.importers import AccountImporter, DocumentImporter, JournalImporter
 from kescher.logging import setup_logging
 from kescher.models import create_tables, JournalEntry
 from pathlib import Path
@@ -22,9 +22,9 @@ def cli(debug):
 
 @cli.command()
 @click.argument("csv_file", type=click.File("r"))
-def import_csv(csv_file):
+def import_journal(csv_file):
     print(f"Importing CSV file {csv_file.name}...")
-    CsvImporter(csv_file)()
+    JournalImporter(csv_file)()
 
 
 @cli.command()

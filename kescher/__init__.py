@@ -1,4 +1,4 @@
-from kescher.importers import CsvImporter, DocumentImporter, AccountImporter
+from kescher.importers import AccountImporter, DocumentImporter, JournalImporter
 from kescher.models import (
     Account,
     AccountEntry,
