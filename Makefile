@@ -12,3 +12,12 @@ test: ## Run software tests
 .PHONY: black
 black: ## Format code
 	python -m black kescher
+
+.PHONY: run
+run: ## Run kescher and import fixtures
+	rm -f kescher.log kescher.db
+	kescher init
+	@kescher import-journal kescher/tests/fixtures/journal.csv
+	@kescher import-accounts kescher/tests/fixtures/accounts.yaml
+	@kescher import-documents kescher/tests/fixtures/documents
+	@kescher import-invoices kescher/tests/fixtures/invoices_nested cid total_gross date
