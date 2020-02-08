@@ -2,8 +2,9 @@ Debitoren:
   - "1000"
   - "1001"
   - "1002"
-Verbindlichkeiten:
-  - Ust
+Umsatzsteuer:
+  - USt_Einnahmen
+  - USt_Ausgaben
 Aufwendungen:
   - Internet
   - Strom

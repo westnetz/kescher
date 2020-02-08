@@ -3,6 +3,7 @@
 import click
 import logging
 
+from kescher.booking import auto_book_vat
 from kescher.importers import (
     AccountImporter,
     DocumentImporter,
@@ -74,6 +75,16 @@ def import_invoices(flat, path, account_key, amount_key, date_key):
     print(f"Import invoices from {path}...")
     InvoiceImporter(path, account_key, amount_key, date_key, flat)()
 
+
+@cli.command()
+@click.argument("vat_percentage", type=click.INT)
+@click.argument("vat_in_acc")
+@click.argument("vat_out_acc")
+def auto_vat(vat_percentage, vat_in_acc, vat_out_acc):
+    """
+    Helper to bulk book vat.
+    """
+    auto_book_vat(vat_percentage, vat_in_acc, vat_out_acc)
 
 @cli.command()
 def init():
