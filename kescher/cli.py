@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
-
+import arrow
 import click
 import logging
 
-from kescher.booking import auto_book_vat
+from kescher.booking import auto_book_vat, get_account_saldo
 from kescher.importers import (
     AccountImporter,
     DocumentImporter,
@@ -85,6 +85,20 @@ def auto_vat(vat_percentage, vat_in_acc, vat_out_acc):
     Helper to bulk book vat.
     """
     auto_book_vat(vat_percentage, vat_in_acc, vat_out_acc)
+
+
+@cli.command()
+@click.argument("account")
+@click.argument("start_date")
+@click.argument("end_date")
+def saldo(account, start_date, end_date):
+    """
+    Sum account bookings for given time frame.
+    """
+    start = arrow.get(start_date)
+    end = arrow.get(end_date)
+    saldo = get_account_saldo(account, start_date, end_date)
+    print(f"Saldo is {saldo}")
 
 
 @cli.command()
