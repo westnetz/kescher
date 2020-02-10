@@ -86,6 +86,7 @@ def auto_vat(vat_percentage, vat_in_acc, vat_out_acc):
     """
     auto_book_vat(vat_percentage, vat_in_acc, vat_out_acc)
 
+
 @cli.command()
 def init():
     """

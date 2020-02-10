@@ -69,20 +69,31 @@ class JournalImporter(Importer):
         """
         n_rows = 0
         with get_db().atomic() as db:
-            for row in tqdm(self.reader):
+            for row in self._iterate_rows():
                 self.logger.debug("Creating: " + ", ".join(row))
-                JournalEntry.create(
-                    date=arrow.get(row[0], "D.M.YYYY").datetime,
-                    sender=row[1],
-                    receiver=row[2],
-                    description=row[3],
-                    value=row[4],
-                    balance=row[5],
-                    imported_at=self.import_date.datetime,
-                )
+                self._import_row(row)
                 n_rows += 1
             db.commit()
         self.logger.info(f"Imported {n_rows} entries.")
+
+    def _import_row(self, row):
+        JournalEntry.create(
+            date=arrow.get(row[0], "D.M.YYYY").datetime,
+            sender=row[1],
+            receiver=row[2],
+            description=row[3],
+            value=row[4],
+            balance=row[5],
+            imported_at=self.import_date.datetime,
+        )
+
+    def sanitize(self, row):
+        return row
+
+    def _iterate_rows(self):
+        for row in tqdm(self.reader):
+            self.logger.debug("Reading: " + ", ".join(row))
+            yield self.sanitize(row)
 
 
 class AccountImporter(Importer):
