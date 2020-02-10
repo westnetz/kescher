@@ -51,8 +51,8 @@ def get_account_saldo(account, start_date, end_date):
         .join(JournalEntry)
         .where(
             (Account.name == account)
-            & (JournalEntry.date >= start_date)
-            & (JournalEntry.date <= end_date)
+            & (JournalEntry.date >= start_date.datetime)
+            & (JournalEntry.date <= end_date.datetime)
         )
         .scalar()
     )
