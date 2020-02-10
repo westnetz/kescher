@@ -87,13 +87,10 @@ class JournalImporter(Importer):
             imported_at=self.import_date.datetime,
         )
 
-    def sanitize(self, row):
-        return row
-
     def _iterate_rows(self):
         for row in tqdm(self.reader):
             self.logger.debug("Reading: " + ", ".join(row))
-            yield self.sanitize(row)
+            yield row
 
 
 class AccountImporter(Importer):
