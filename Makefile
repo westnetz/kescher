@@ -10,8 +10,15 @@ test: ## Run software tests
 	pytest -v kescher --cov=./ --cov-report term-missing:skip-covered $(PYTEST_ARGS)
 
 .PHONY: black
-black: ## Format code
+black: ## Format the code
 	python -m black kescher
+
+.PHONY: flake
+flake: ## Flake8 the code
+	flake8 kescher
+
+.PHONY: check
+check: black flake## Perform black and flake checks (Should be done pre-commit)
 
 .PHONY: run
 run: ## Run kescher and import fixtures

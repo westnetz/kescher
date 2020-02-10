@@ -1,4 +1,3 @@
-import csv
 import yaml
 
 from click.testing import CliRunner
@@ -28,6 +27,7 @@ DOC_HASHES = {
 def test_init_creates_db_and_log():
     runner = CliRunner()
     result = runner.invoke(cli, ("--debug", "init"))
+    assert result.exit_code == 0
     assert Path(KESCHER_DB).is_file()
     assert Path(KESCHER_LOG).is_file()
 
@@ -35,6 +35,7 @@ def test_init_creates_db_and_log():
 def test_init_debug_writes_to_log():
     runner = CliRunner()
     result = runner.invoke(cli, ("--debug", "init"))
+    assert result.exit_code == 0
     with open(KESCHER_LOG) as logfile:
         log_content = logfile.read()
         assert "kescher - DEBUG - Debug mode is on" in log_content

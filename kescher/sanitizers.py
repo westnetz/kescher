@@ -7,10 +7,8 @@ and usable format.
 import click
 import csv
 import locale
-import yaml
 
 from decimal import Decimal
-from pathlib import Path
 
 LOCALE = "de_DE.UTF-8"
 DECIMAL_QUANTIZATION = ".01"

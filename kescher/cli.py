@@ -11,7 +11,7 @@ from kescher.importers import (
     JournalImporter,
 )
 from kescher.logging import setup_logging
-from kescher.models import create_tables, JournalEntry
+from kescher.models import create_tables
 from pathlib import Path
 
 cwd = Path.cwd()
@@ -70,7 +70,7 @@ def import_documents(path):
 @click.argument("date_key")
 def import_invoices(flat, path, account_key, amount_key, date_key):
     """
-    Bulk import yaml invoices. 
+    Bulk import yaml invoices.
     """
     print(f"Import invoices from {path}...")
     InvoiceImporter(path, account_key, amount_key, date_key, flat)()
@@ -97,7 +97,7 @@ def saldo(account, start_date, end_date):
     """
     start = arrow.get(start_date)
     end = arrow.get(end_date)
-    saldo = get_account_saldo(account, start_date, end_date)
+    saldo = get_account_saldo(account, start, end)
     print(f"Saldo is {saldo}")
 
 

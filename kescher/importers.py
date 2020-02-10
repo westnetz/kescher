@@ -1,9 +1,9 @@
 """
-Home of all importers. 
+Home of all importers.
 
-Importers are bulk operators. I.e. they  read yaml or csv data and 
-put them into the database in bulks. This is necessary to get bank 
-data, as well as the account structure easily into the database, 
+Importers are bulk operators. I.e. they  read yaml or csv data and
+put them into the database in bulks. This is necessary to get bank
+data, as well as the account structure easily into the database,
 without having to set up everything by hand or one by one.
 """
 import arrow
@@ -96,7 +96,7 @@ class JournalImporter(Importer):
 class AccountImporter(Importer):
     """
     The AccountImporter is a helper to set up your accounts (Kontenrahmen).
-    As this can easily done in a yaml file. This yaml file is then loaded 
+    As this can easily done in a yaml file. This yaml file is then loaded
     into the AccountImporter which will automagically create all accounts
     accordingly.
     """
@@ -104,7 +104,7 @@ class AccountImporter(Importer):
     def __init__(self, account_file):
         """
         Must be given the account file. Database connection is already established
-        at this point, as the parents are referenced accross functions, and we 
+        at this point, as the parents are referenced accross functions, and we
         need an established connection to allow this.
         """
         self.account_file = account_file
@@ -190,34 +190,31 @@ class DocumentImporter(Importer):
             doc_iterator = self._iterate_flat
         else:
             doc_iterator = self._iterate_nested
-        with get_db() as db:
-            for doc_path in doc_iterator():
-                exists = True
-                doc_hash = Document.make_hash(doc_path)
-                self.logger.debug(f"Importing {doc_path} ({doc_hash}).")
+        for doc_path in doc_iterator():
+            exists = True
+            doc_hash = Document.make_hash(doc_path)
+            self.logger.debug(f"Importing {doc_path} ({doc_hash}).")
 
-                try:
-                    doc_db = Document.get(Document.path == str(doc_path))
-                except DoesNotExist:
-                    exists = False
+            try:
+                doc_db = Document.get(Document.path == str(doc_path))
+            except DoesNotExist:
+                exists = False
 
-                if not exists:
-                    self.logger.debug(f"{doc_path} not found in db. Importing...")
-                    doc_content = extract_text(doc_path)
-                    Document.create(content=doc_content, hash=doc_hash, path=doc_path)
-                    self.n_new_documents += 1
+            if not exists:
+                self.logger.debug(f"{doc_path} not found in db. Importing...")
+                doc_content = extract_text(doc_path)
+                Document.create(content=doc_content, hash=doc_hash, path=doc_path)
+                self.n_new_documents += 1
+            else:
+                self.logger.debug(f"Checking hash of existing document {doc_path} ...")
+                if not doc_db.hash == doc_hash:
+                    self.logger.warning(
+                        f"Hashes of existing and to-be-imported {doc_path} don't match!"
+                    )
                 else:
                     self.logger.debug(
-                        f"Checking hash of existing document {doc_path} ..."
+                        f"Hash {doc_hash} of doc to be imported matches hash in db."
                     )
-                    if not doc_db.hash == doc_hash:
-                        self.logger.warning(
-                            f"Hashes of existing and to-be-imported {doc_path} don't match!"
-                        )
-                    else:
-                        self.logger.debug(
-                            f"Hash {doc_hash} of doc to be imported matches hash in db."
-                        )
         self.logger.info(f"Imported {self.n_new_documents} new documents.")
 
 
@@ -247,23 +244,21 @@ class InvoiceImporter(Importer):
             invoice_iterator = self._iterate_flat
         else:
             invoice_iterator = self._iterate_nested
-        with get_db().atomic() as db:
-            for invoice_path in invoice_iterator():
-                with open(invoice_path) as infile:
-                    invoice = yaml.safe_load(infile)
-                document = Document.get_or_none(
-                    Document.path
-                    == invoice_path.with_suffix(DocumentImporter.EXTENSION)
-                )
-                self.logger.debug(f"Importing invoice {invoice['id']}...")
-                account, created = Account.get_or_create(
-                    name=str(invoice[self.account_key])
-                )
-                if created:
-                    self.logger.debug(f"Created new account {account}...")
-                VirtualBooking.create(
-                    account_id=account.id,
-                    document_id=document.id,
-                    value=invoice[self.amount_key],
-                    date=arrow.get(invoice[self.date_key], "DD.MM.YYYY").datetime,
-                )
+        for invoice_path in invoice_iterator():
+            with open(invoice_path) as infile:
+                invoice = yaml.safe_load(infile)
+            document = Document.get_or_none(
+                Document.path == invoice_path.with_suffix(DocumentImporter.EXTENSION)
+            )
+            self.logger.debug(f"Importing invoice {invoice['id']}...")
+            account, created = Account.get_or_create(
+                name=str(invoice[self.account_key])
+            )
+            if created:
+                self.logger.debug(f"Created new account {account}...")
+            VirtualBooking.create(
+                account_id=account.id,
+                document_id=document.id,
+                value=invoice[self.amount_key],
+                date=arrow.get(invoice[self.date_key], "DD.MM.YYYY").datetime,
+            )

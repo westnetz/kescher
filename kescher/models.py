@@ -4,7 +4,6 @@ import hashlib
 from kescher.database import get_db
 from pathlib import Path
 from peewee import (
-    BooleanField,
     CharField,
     DateField,
     DateTimeField,
@@ -97,7 +96,7 @@ class Booking(BaseModel):
 
 class VirtualBooking(BaseModel):
     """
-    To allow for cash accounting, all invoices are to be created as virtual 
+    To allow for cash accounting, all invoices are to be created as virtual
     account entries.
     """
 

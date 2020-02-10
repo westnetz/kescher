@@ -1,8 +1,6 @@
-import arrow
 import logging
 
 from decimal import Decimal
-from kescher.database import get_db
 from kescher.models import Account, Booking, JournalEntry
 from peewee import fn
 
@@ -28,23 +26,21 @@ def auto_book_vat(percentage, vat_in_acc, vat_out_acc):
             print(f"VAT already booked for {je.id} ({je.date})")
             continue
         if je.value > 0:
-            with get_db() as db:
-                booking_value = round(
-                    je.value - (je.value * 100) / (100 + Decimal(percentage)), 2
-                )
-                Booking.create(
-                    value=booking_value, account_id=vat_in_id, journalentry_id=je.id,
-                )
-                logger.debug(f"Added Booking of {booking_value} to {vat_in_acc}.")
+            booking_value = round(
+                je.value - (je.value * 100) / (100 + Decimal(percentage)), 2
+            )
+            Booking.create(
+                value=booking_value, account_id=vat_in_id, journalentry_id=je.id,
+            )
+            logger.debug(f"Added Booking of {booking_value} to {vat_in_acc}.")
         elif je.value < 0:
-            with get_db() as db:
-                booking_value = -round(
-                    je.value - (je.value * 100) / (100 + Decimal(percentage)), 2
-                )
-                Booking.create(
-                    value=booking_value, account_id=vat_out_id, journalentry_id=je.id,
-                )
-                logger.debug(f"Added Booking of {booking_value} to {vat_out_acc}.")
+            booking_value = -round(
+                je.value - (je.value * 100) / (100 + Decimal(percentage)), 2
+            )
+            Booking.create(
+                value=booking_value, account_id=vat_out_id, journalentry_id=je.id,
+            )
+            logger.debug(f"Added Booking of {booking_value} to {vat_out_acc}.")
 
 
 def get_account_saldo(account, start_date, end_date):
