@@ -65,6 +65,11 @@ class CsvHeaderError(Exception):
 @click.argument("infile", type=click.File("r", encoding="latin3"))
 @click.argument("outfile", type=click.File("w"))
 def sanitize_postbank(infile, outfile):
+    """
+    Helper to convert the shitty CSV files you get from Postbank (Germany)
+    into a somewhat reasonable format we can work with. Please give
+    an input and an output file as arguments.
+    """
     pb_csv_parser = PostBankCsvParser(DECIMAL_QUANTIZATION)
     locale.setlocale(locale.LC_ALL, LOCALE)
     reader = csv.reader(infile, quotechar='"', delimiter=";")
