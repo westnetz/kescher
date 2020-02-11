@@ -65,7 +65,7 @@ class JournalEntry(BaseModel):
     date = DateField()
     sender = CharField()
     receiver = CharField()
-    description = CharField()
+    subject = CharField()
     document = ForeignKeyField(Document, null=True, backref="journal_entries")
     value = DecimalField()
     balance = DecimalField()

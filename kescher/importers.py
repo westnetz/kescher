@@ -81,7 +81,7 @@ class JournalImporter(Importer):
             date=arrow.get(row[0], "D.M.YYYY").datetime,
             sender=row[1],
             receiver=row[2],
-            description=row[3],
+            subject=row[3],
             value=row[4],
             balance=row[5],
             imported_at=self.import_date.datetime,
