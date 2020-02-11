@@ -20,6 +20,18 @@ flake: ## Flake8 the code
 .PHONY: check
 check: black flake## Perform black and flake checks (Should be done pre-commit)
 
+.PHONY: docs
+docs:
+	rm -f docs/kescher.rst
+	rm -f docs/modules.rst
+	sphinx-apidoc -o docs kescher
+	$(MAKE) -C docs clean
+	$(MAKE) -C docs html
+
+.PHONY: serve-docs
+serve-docs: 
+	@cd docs/_build/html/ && python -m http.server && cd ../../..
+
 .PHONY: run
 run: ## Run kescher and import fixtures
 	rm -f kescher.log kescher.db

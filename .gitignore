@@ -14,3 +14,5 @@ accounts.yaml
 # Working dir files
 kescher.log
 kescher.db
+
+docs/_build/
