@@ -108,10 +108,14 @@ def show():
 
 
 @show.command()
+@click.option("--filter", default=None)
 @click.option("--width", default=80)
-def journal(width):
-    for entry in show_journal(width):
-        print("|".join(entry))
+def journal(filter, width):
+    try:
+        for entry in show_journal(filter, width):
+            print("|".join(entry))
+    except ValueError as e:
+        print(e)
 
 
 @show.command()
