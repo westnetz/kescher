@@ -12,6 +12,7 @@ from kescher.importers import (
 )
 from kescher.logging import setup_logging
 from kescher.models import create_tables
+from kescher.show import show_accounts, show_journal
 from pathlib import Path
 
 cwd = Path.cwd()
@@ -100,6 +101,23 @@ def saldo(account, start_date, end_date):
     saldo = get_account_saldo(account, start, end)
     print(f"Saldo is {saldo}")
 
+
+@cli.group()
+def show():
+    pass
+
+
+@show.command()
+@click.option("--width", default=80)
+def journal(width):
+    for entry in show_journal(width):
+        print("_".join(entry))
+
+
+@show.command()
+def accounts():
+    print("Accounts")
+    show_accounts()
 
 @cli.command()
 def init():
