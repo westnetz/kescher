@@ -15,6 +15,6 @@ def show_journal(width):
             je.sender[:15].ljust(15, "_"),
             je.receiver[:15].ljust(15, "_"),
             je.subject[:subject_width].ljust(subject_width, "_"),
-            str(round(je.value, 2)).rjust(9, "_"),
-            str(round(je.balance, 2)).rjust(9, "_"),
+            str(round(je.value, 2)).rjust(9, " "),
+            str(round(je.balance, 2)).rjust(9, " "),
         )

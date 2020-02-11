@@ -111,13 +111,14 @@ def show():
 @click.option("--width", default=80)
 def journal(width):
     for entry in show_journal(width):
-        print("_".join(entry))
+        print("|".join(entry))
 
 
 @show.command()
 def accounts():
     print("Accounts")
     show_accounts()
+
 
 @cli.command()
 def init():
