@@ -60,9 +60,10 @@ class CsvHeaderError(Exception):
 
 
 @click.command()
+@click.option("--reverse", is_flag=True, default=False, help="Reverse order of rows")
 @click.argument("infile", type=click.File("r", encoding="latin3"))
 @click.argument("outfile", type=click.File("w"))
-def sanitize_postbank(infile, outfile):
+def sanitize_postbank(reverse, infile, outfile):
     """
     Helper to convert the shitty CSV files you get from Postbank (Germany)
     into a somewhat reasonable format we can work with. Please give
@@ -74,5 +75,11 @@ def sanitize_postbank(infile, outfile):
     writer = csv.writer(
         outfile, quotechar='"', delimiter=";", quoting=csv.QUOTE_MINIMAL
     )
+
+    rows = []
     for row in reader:
-        writer.writerow(pb_csv_parser.get_entry(row))
+        rows.append(pb_csv_parser.get_entry(row))
+
+    if reverse:
+        rows.reverse()
+    writer.writerows(rows)
