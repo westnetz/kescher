@@ -1,3 +1,4 @@
+from decimal import Decimal
 from kescher.models import Account, JournalEntry
 
 
@@ -6,7 +7,7 @@ def show_accounts():
         yield account
 
 
-def show_journal(filter_, width):
+def show_journal(filter_, width, header=True):
     """
     Selects the JournalEntries to be shown and yields them.
     Filters can be given with column:filter_string as the first
@@ -15,11 +16,19 @@ def show_journal(filter_, width):
     """
     column = None
     subject_width = width - 54
+    columns = (
+        ("id", 3, "zfill"),
+        ("sender", 15, "ljust"),
+        ("receiver", 15, "ljust"),
+        ("subject", subject_width, "ljust"),
+        ("value", 9, "rjust"),
+        ("balance", 9, "rjust"),
+    )
 
     if filter_:
-        filter_split = filter_.split(":")
+        filter_split = filter_.split("=")
         if len(filter_split) != 2:
-            raise ValueError("Filter must contain exactly one :")
+            raise ValueError("Filter must contain exactly one '='")
         column, filter_string = filter_split
         if not hasattr(JournalEntry, column):
             raise ValueError(f"{column} is not filterable column")
@@ -31,12 +40,16 @@ def show_journal(filter_, width):
     else:
         selector = JournalEntry.select()
 
+    if header:
+        yield [c[0].ljust(c[1]) for c in columns]
+
     for je in selector:
-        yield (
-            str(je.id).zfill(3),
-            je.sender[:15].ljust(15, "_"),
-            je.receiver[:15].ljust(15, "_"),
-            je.subject[:subject_width].ljust(subject_width, "_"),
-            str(round(je.value, 2)).rjust(9, " "),
-            str(round(je.balance, 2)).rjust(9, " "),
-        )
+        line = []
+        for col, length, just in columns:
+            value = getattr(je, col)
+            if isinstance(value, Decimal):
+                value = round(value, 2)
+            element = str(value)[:length]
+            just_method = getattr(element, just)
+            line.append(just_method(length))
+        yield line

@@ -10,6 +10,7 @@ from kescher.importers import (
     InvoiceImporter,
     JournalImporter,
 )
+from kescher.helpers import Box
 from kescher.logging import setup_logging
 from kescher.models import create_tables
 from kescher.show import show_accounts, show_journal
@@ -109,11 +110,19 @@ def show():
 
 @show.command()
 @click.option("--filter", default=None)
-@click.option("--width", default=80)
+@click.option("--width", type=click.INT, default=80)
 def journal(filter, width):
+    box_helper = None
     try:
         for entry in show_journal(filter, width):
-            print("|".join(entry))
+            if not box_helper:
+                box_helper = Box([len(e) for e in entry])
+                print(box_helper.top())
+            else:
+                print(box_helper.center())
+            print(box_helper.content(entry))
+        print(box_helper.bottom())
+
     except ValueError as e:
         print(e)
 
