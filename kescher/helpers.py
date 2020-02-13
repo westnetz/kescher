@@ -11,19 +11,37 @@ class Box:
         self.widths = widths
         self.filler = ["─" * w for w in widths]
 
-    def fill(self, left, center, right, filler=None):
+    def _fill(self, left, center, right, filler=None):
+        """
+        Internal function used by top(), center(), bottom()
+        and content(). Returns the created divider, top, bottom
+        (if no filler is given) or content row (if filler given).
+        """
         if not filler:
             filler = self.filler
         return left + center.join(filler) + right
 
     def top(self):
-        return self.fill("┎", "┬", "┒")
+        """
+        Returns the top of a box specified by self.widths
+        """
+        return self._fill("┎", "┬", "┒")
 
     def center(self):
-        return self.fill("┠", "┼", "┨")
+        """
+        Returns a row divider of a box specified by self.widths
+        """
+        return self._fill("┠", "┼", "┨")
 
     def bottom(self):
-        return self.fill("┖", "┴", "┚")
+        """
+        Returns the bottom of a box specified by self.widths
+        """
+        return self._fill("┖", "┴", "┚")
 
     def content(self, content):
-        return self.fill("┃", "│", "┃", content)
+        """
+        Accepts a list/tuple with the cells of a row and
+        returns it ready to be printed.
+        """
+        return self._fill("┃", "│", "┃", content)
