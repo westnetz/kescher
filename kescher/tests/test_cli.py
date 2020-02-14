@@ -142,6 +142,58 @@ def test_import_document():
             assert db_doc.path.endswith(doc_name)
 
 
+def test_show_journal_filtered(journal_filtered_klausi_meyer):
+    """
+    Test if the column filter returns only the desired columns (on exact match!).
+    """
+    runner = CliRunner()
+    result = runner.invoke(cli, ("show", "journal", "--filter", "sender=Klausi Meyer"))
+    assert result.exit_code == 0
+    output = result.output.strip().split("\n")
+    assert len(journal_filtered_klausi_meyer) == len(output)
+    for line in journal_filtered_klausi_meyer:
+        assert line in output
+
+    # Check for empty result on non existing sender Klaus (instead of Klausi)
+    result = runner.invoke(cli, ("show", "journal", "--filter", "sender=Klaus Meyer"))
+    assert result.exit_code == 0
+    output = result.output.strip().split("\n")
+    assert len(output) == 3
+    for line in [0,1,4]:
+        assert journal_filtered_klausi_meyer[line] in output
+
+
+def test_auto_vat():
+    """
+    Asserts the auto-vat command executes without error.
+    The results are checked separately with the show_saldo test command.
+    """
+    runner = CliRunner()
+    result = runner.invoke(cli, ("auto-vat", "19", "USt_Einnahmen", "USt_Ausgaben"))
+    assert result.exit_code == 0
+    result_again = runner.invoke(
+        cli, ("auto-vat", "19", "USt_Einnahmen", "USt_Ausgaben")
+    )
+    assert result_again.exit_code == 0
+
+
+def test_show_saldo():
+    """
+    This test show the saldo of the specified account in the specified range of time.
+    """
+    runner = CliRunner()
+    result_in = runner.invoke(
+        cli, ("show", "saldo", "USt_Einnahmen", "2020-01-01", "2020-03-31")
+    )
+    assert result_in.exit_code == 0
+    assert result_in.output.strip() == "Saldo is 18.52"
+    result_out = runner.invoke(
+        cli, ("show", "saldo", "USt_Ausgaben", "2020-01-01", "2020-03-31")
+    )
+    assert result_out.exit_code == 0
+    assert result_out.output.strip() == "Saldo is 29.48"
+
+
 def test_show_accounts(expected_accounts):
     """
     Asserts the list of accounts matches the expected accounts.
@@ -153,6 +205,3 @@ def test_show_accounts(expected_accounts):
     for acc in expected_accounts:
         assert acc in output
     assert len(expected_accounts) == len(output)
-
-
-
