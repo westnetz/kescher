@@ -11,7 +11,7 @@ test: ## Run software tests
 
 .PHONY: black
 black: ## Format the code
-	python -m black kescher
+	python -m black --check kescher
 
 .PHONY: flake
 flake: ## Flake8 the code

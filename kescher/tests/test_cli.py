@@ -159,7 +159,7 @@ def test_show_journal_filtered(journal_filtered_klausi_meyer):
     assert result.exit_code == 0
     output = result.output.strip().split("\n")
     assert len(output) == 3
-    for line in [0,1,4]:
+    for line in [0, 1, 4]:
         assert journal_filtered_klausi_meyer[line] in output
 
 
