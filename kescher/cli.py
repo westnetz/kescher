@@ -89,7 +89,12 @@ def auto_vat(vat_percentage, vat_in_acc, vat_out_acc):
     auto_book_vat(vat_percentage, vat_in_acc, vat_out_acc)
 
 
-@cli.command()
+@cli.group()
+def show():
+    pass
+
+
+@show.command()
 @click.argument("account")
 @click.argument("start_date")
 @click.argument("end_date")
@@ -101,11 +106,6 @@ def saldo(account, start_date, end_date):
     end = arrow.get(end_date)
     saldo = get_account_saldo(account, start, end)
     print(f"Saldo is {saldo}")
-
-
-@cli.group()
-def show():
-    pass
 
 
 @show.command()
@@ -129,8 +129,11 @@ def journal(filter, width):
 
 @show.command()
 def accounts():
-    print("Accounts")
-    show_accounts()
+    """
+    List all known accounts
+    """
+    for acc in show_accounts():
+        print(acc)
 
 
 @cli.command()

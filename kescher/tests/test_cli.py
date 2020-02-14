@@ -140,3 +140,19 @@ def test_import_document():
     for doc_name, doc_hash in DOC_HASHES.items():
         for db_doc in Document.select().where(Document.hash == doc_hash):
             assert db_doc.path.endswith(doc_name)
+
+
+def test_show_accounts(expected_accounts):
+    """
+    Asserts the list of accounts matches the expected accounts.
+    """
+    runner = CliRunner()
+    result = runner.invoke(cli, ("show", "accounts"))
+    assert result.exit_code == 0
+    output = result.output.strip().split("\n")
+    for acc in expected_accounts:
+        assert acc in output
+    assert len(expected_accounts) == len(output)
+
+
+
