@@ -17,7 +17,6 @@ def test_sanitize_postbank_regular(tmp_path):
     result = runner.invoke(
         sanitize_postbank, (str(POSTBANK_STATEMENT), str(outfilename))
     )
-    print(result.output)
     assert result.exit_code == 0
 
     golden_master = []
