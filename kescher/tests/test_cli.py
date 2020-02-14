@@ -1,3 +1,7 @@
+"""
+This module contains the tests for cli commands. It asserts that the
+command line interface works as intended.
+"""
 import yaml
 
 from click.testing import CliRunner
@@ -25,6 +29,10 @@ DOC_HASHES = {
 
 
 def test_init_creates_db_and_log():
+    """
+    Asserts that a database file and a log file is created and the
+    init command exits with 0 as exit_code.
+    """
     runner = CliRunner()
     result = runner.invoke(cli, ("--debug", "init"))
     assert result.exit_code == 0
@@ -33,6 +41,9 @@ def test_init_creates_db_and_log():
 
 
 def test_init_debug_writes_to_log():
+    """
+    Asserts that the --debug flag turns on debug messages to be written to the log.
+    """
     runner = CliRunner()
     result = runner.invoke(cli, ("--debug", "init"))
     assert result.exit_code == 0
@@ -42,6 +53,9 @@ def test_init_debug_writes_to_log():
 
 
 def test_import_accounts():
+    """
+    Asserts that a set of test accounts are imported correctly.
+    """
     runner = CliRunner()
     result = runner.invoke(cli, ["import-accounts", str(ACCOUNTS_FILE)])
     assert result.exit_code == 0
@@ -58,6 +72,9 @@ def test_import_accounts():
 
 
 def iterate_accounts(accounts):
+    """
+    Helper function to iterate to ease iterating through the accounts.
+    """
     if isinstance(accounts, list):
         for account in accounts:
             if isinstance(account, str):
@@ -71,6 +88,10 @@ def iterate_accounts(accounts):
 
 
 def test_import_journal():
+    """
+    Asserts that a test journal is imported correctly and the import exits
+    with 0 as exit code.
+    """
     runner = CliRunner()
     result = runner.invoke(cli, ["import-journal", str(JOURNAL_FILE)])
     assert result.exit_code == 0
@@ -80,6 +101,11 @@ def test_import_journal():
 
 
 def test_import_invoices():
+    """
+    Asserts that invoices are imported correctly, connected pdf documents are
+    imported as well and the command exits with 0 as exit code. The invoices
+    import is perfomed for the nested and flat directory structure.
+    """
     runner = CliRunner()
     result = runner.invoke(
         cli, ["import-invoices", str(INVOICES_NESTED), "cid", "total_gross", "date"]
@@ -102,8 +128,11 @@ def test_import_invoices():
 
 
 def test_import_document():
+    """
+    Asserts that document import from a flat directory structure works correctly.
+    """
     runner = CliRunner()
-    result = runner.invoke(cli, ["import-documents", str(INVOICES_FLAT)])
+    result = runner.invoke(cli, ("import-documents", str(INVOICES_FLAT)))
     assert result.exit_code == 0
     output_string = "Importing documents from kescher/tests/fixtures/invoices_flat..."
     assert output_string in result.output
