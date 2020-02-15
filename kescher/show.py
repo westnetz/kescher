@@ -31,7 +31,7 @@ def show_journal(filter_, width, header=True):
             raise ValueError("Filter must contain exactly one '='")
         column, filter_string = filter_split
         if not hasattr(JournalEntry, column):
-            raise ValueError(f"{column} is not filterable column")
+            raise ValueError(f"{column} is not a filterable column")
 
     if column:
         selector = JournalEntry.select().where(

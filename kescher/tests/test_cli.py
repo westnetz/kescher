@@ -142,16 +142,32 @@ def test_import_document():
             assert db_doc.path.endswith(doc_name)
 
 
-def test_show_journal_filtered(journal_filtered_klausi_meyer):
+def test_show_journal_errors():
     """
     Test if the column filter returns only the desired columns (on exact match!).
     """
     # Test with invalid filter character
-    runner = CliRunner()
-    result = runner.invoke(cli, ("show", "journal", "--filter", "sender:Klausi Meyer"))
-    assert result.exit_code == 1
-    assert result.output.strip() == "Filter must contain exactly one '='"
+    runner_char = CliRunner()
+    result_char = runner_char.invoke(
+        cli, ("show", "journal", "--filter", "sender:Klausi Meyer")
+    )
+    assert result_char.exit_code == 1
+    assert result_char.output.strip() == "Filter must contain exactly one '='"
 
+    # Test with invalid filter character
+    runner_col = CliRunner()
+    result_col = runner_col.invoke(
+        cli, ("show", "journal", "--filter", "send=Klausi Meyer")
+    )
+    assert result_col.exit_code == 1
+    assert result_col.output.strip() == "send is not a filterable column"
+
+
+def test_show_journal_filtered(journal_filtered_klausi_meyer):
+    """
+    Test if the column filter returns only the desired columns (on exact match!).
+    """
+    #
     runner = CliRunner()
     result = runner.invoke(cli, ("show", "journal", "--filter", "sender=Klausi Meyer"))
     assert result.exit_code == 0
