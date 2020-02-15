@@ -146,6 +146,12 @@ def test_show_journal_filtered(journal_filtered_klausi_meyer):
     """
     Test if the column filter returns only the desired columns (on exact match!).
     """
+    # Test with invalid filter character
+    runner = CliRunner()
+    result = runner.invoke(cli, ("show", "journal", "--filter", "sender:Klausi Meyer"))
+    assert result.exit_code == 1
+    assert result.output.strip() == "Filter must contain exactly one '='"
+
     runner = CliRunner()
     result = runner.invoke(cli, ("show", "journal", "--filter", "sender=Klausi Meyer"))
     assert result.exit_code == 0

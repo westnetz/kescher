@@ -2,6 +2,7 @@
 import arrow
 import click
 import logging
+import sys
 
 from kescher.booking import auto_book_vat, get_account_saldo
 from kescher.importers import (
@@ -124,7 +125,7 @@ def journal(filter, width):
         print(box_helper.bottom())
 
     except ValueError as e:
-        print(e)
+        sys.exit(e)
 
 
 @show.command()
