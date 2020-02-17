@@ -56,4 +56,6 @@ def get_account_saldo(account, start_date, end_date):
         )
         .scalar()
     )
+    if saldo is None:
+        saldo = Decimal("0.0")
     return round(saldo, 2)
