@@ -4,6 +4,7 @@ import click
 import logging
 
 from colorama import init, Fore
+from decimal import Decimal
 from kescher.booking import auto_book_vat, get_account_saldo
 from kescher.filters import EntryFilter, JournalFilter
 from kescher.importers import (
@@ -90,15 +91,37 @@ def import_invoices(flat, path, account_key, amount_key, date_key):
     InvoiceImporter(path, account_key, amount_key, date_key, flat)()
 
 
-@cli.command()
+@cli.group()
+def book():
+    """
+    Book to accounts or automatically book VAT.
+    """
+    pass
+
+
+@book.command()
 @click.argument("vat_percentage", type=click.INT)
 @click.argument("vat_in_acc")
 @click.argument("vat_out_acc")
-def auto_vat(vat_percentage, vat_in_acc, vat_out_acc):
+def vat(vat_percentage, vat_in_acc, vat_out_acc):
     """
     Helper to bulk book vat.
+
+    You have to give your default VAT percentage as well as the names of your VAT accounts.
     """
     auto_book_vat(vat_percentage, vat_in_acc, vat_out_acc)
+
+
+@book.command()
+@click.option("--value", "-v", type=Decimal)
+@click.option("--comment", "-c")
+@click.argument("journalentry")
+@click.argument("account")
+def entry(value, comment, journalentry, account):
+    """
+    Book the absolute value of the non-booked rest of a journalentry to the given account.
+    """
+    print(type(value), comment, journalentry, account)
 
 
 @cli.group()

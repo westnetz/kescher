@@ -199,10 +199,10 @@ def test_auto_vat():
     The results are checked separately with the show_saldo test command.
     """
     runner = CliRunner()
-    result = runner.invoke(cli, ("auto-vat", "19", "USt_Einnahmen", "USt_Ausgaben"))
+    result = runner.invoke(cli, ("book", "vat", "19", "USt_Einnahmen", "USt_Ausgaben"))
     assert result.exit_code == 0
     result_again = runner.invoke(
-        cli, ("auto-vat", "19", "USt_Einnahmen", "USt_Ausgaben")
+        cli, ("book", "vat", "19", "USt_Einnahmen", "USt_Ausgaben")
     )
     assert result_again.exit_code == 0
 
