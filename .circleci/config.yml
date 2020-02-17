@@ -10,7 +10,7 @@ jobs:
       - run:
           name: Setup locales
           command: |
-            sudo sed -i -e 's/# (de_DE.UTF-8)/$1/g' /etc/locale.gen
+            sudo sed -i -e 's/# de_DE.UTF-8/de_DE.UTF-8/g' /etc/locale.gen
             sudo locale-gen
       - run:
           name: Install Python dependencies in a venv
