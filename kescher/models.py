@@ -71,6 +71,13 @@ class JournalEntry(BaseModel):
     balance = DecimalField()
     imported_at = DateTimeField()
 
+    def __str__(self):
+        return f"{self.date} - \
+                 {self.sender[:10]} - \
+                 {self.receiver[:10]} - \
+                 {self.subject[:10]} - \
+                 {self.value}"
+
 
 class Account(BaseModel):
     """
@@ -78,7 +85,7 @@ class Account(BaseModel):
     """
 
     name = CharField()
-    parent = ForeignKeyField("self", null=True, backref="children")
+    parent = ForeignKeyField("self", null=True, backref="child_accounts")
 
     def __str__(self):
         return self.name
@@ -91,6 +98,7 @@ class Booking(BaseModel):
 
     account = ForeignKeyField(Account, backref="account_entries")
     journalentry = ForeignKeyField(JournalEntry, backref="account_entries")
+    comment = CharField(null=True)
     value = DecimalField()
 
 
@@ -103,6 +111,7 @@ class VirtualBooking(BaseModel):
     account = ForeignKeyField(Account, backref="account_entries")
     date = DateField()
     document = ForeignKeyField(Document, null=True, backref="journal_entries")
+    comment = CharField(null=True)
     value = DecimalField()
 
 

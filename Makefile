@@ -11,14 +11,15 @@ test: ## Run software tests
 
 .PHONY: black
 black: ## Format the code
-	python -m black --check kescher
+	python -m black kescher
 
 .PHONY: flake
 flake: ## Flake8 the code
-	flake8 kescher
+	flake8 --max-line-length=99 kescher
 
 .PHONY: check
-check: black flake## Perform black and flake checks (Should be done pre-commit)
+check: flake ## Perform black and flake checks (Should be done pre-commit)
+	python -m black --check kescher
 
 .PHONY: docs
 docs:
