@@ -25,4 +25,4 @@ jobs:
             . venv/bin/activate
             make test
       - codecov/upload:
-          file: ".converage" 
+          file: ".coverage" 
