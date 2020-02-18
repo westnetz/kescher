@@ -57,7 +57,7 @@ def test_import_accounts():
     Asserts that a set of test accounts are imported correctly.
     """
     runner = CliRunner()
-    result = runner.invoke(cli, ["import-accounts", str(ACCOUNTS_FILE)])
+    result = runner.invoke(cli, ["import", "accounts", str(ACCOUNTS_FILE)])
     assert result.exit_code == 0
     output_string = (
         "Importing accounts from file kescher/tests/fixtures/accounts.yaml..."
@@ -93,7 +93,7 @@ def test_import_journal():
     with 0 as exit code.
     """
     runner = CliRunner()
-    result = runner.invoke(cli, ["import-journal", str(JOURNAL_FILE)])
+    result = runner.invoke(cli, ["import", "journal", str(JOURNAL_FILE)])
     assert result.exit_code == 0
     output_string = "Importing CSV journal kescher/tests/fixtures/journal.csv..."
     assert output_string in result.output
@@ -108,7 +108,7 @@ def test_import_invoices():
     """
     runner = CliRunner()
     result = runner.invoke(
-        cli, ["import-invoices", str(INVOICES_NESTED), "cid", "total_gross", "date"]
+        cli, ["import", "invoices", str(INVOICES_NESTED), "cid", "total_gross", "date"]
     )
     assert result.exit_code == 0
     output_string = "Import invoices from kescher/tests/fixtures/invoices_nested..."
@@ -116,7 +116,15 @@ def test_import_invoices():
     assert len(Document.select()) == 6
     result = runner.invoke(
         cli,
-        ["import-invoices", "--flat", str(INVOICES_FLAT), "cid", "total_gross", "date"],
+        [
+            "import",
+            "invoices",
+            "--flat",
+            str(INVOICES_FLAT),
+            "cid",
+            "total_gross",
+            "date",
+        ],
     )
     output_string = "Import invoices from kescher/tests/fixtures/invoices_flat..."
     assert output_string in result.output
@@ -132,7 +140,7 @@ def test_import_document():
     Asserts that document import from a flat directory structure works correctly.
     """
     runner = CliRunner()
-    result = runner.invoke(cli, ("import-documents", str(INVOICES_FLAT)))
+    result = runner.invoke(cli, ("import", "documents", str(INVOICES_FLAT)))
     assert result.exit_code == 0
     output_string = "Importing documents from kescher/tests/fixtures/invoices_flat..."
     assert output_string in result.output

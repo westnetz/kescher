@@ -35,7 +35,15 @@ def cli(debug):
     logger.debug("Debug mode is on")
 
 
-@cli.command()
+@cli.group("import")
+def importer():
+    """
+    Import documents, journal, invoices and accounts.
+    """
+    pass
+
+
+@importer.command("journal")
 @click.argument("journal_file", type=click.File("r"))
 def import_journal(journal_file):
     """
@@ -45,7 +53,7 @@ def import_journal(journal_file):
     JournalImporter(journal_file)()
 
 
-@cli.command()
+@importer.command("accounts")
 @click.argument("account_file", type=click.File("r"))
 def import_accounts(account_file):
     """
@@ -55,7 +63,7 @@ def import_accounts(account_file):
     AccountImporter(account_file)()
 
 
-@cli.command()
+@importer.command("documents")
 @click.argument("path", type=click.Path(exists=True))
 def import_documents(path):
     """
@@ -65,7 +73,7 @@ def import_documents(path):
     DocumentImporter(path)()
 
 
-@cli.command()
+@importer.command("invoices")
 @click.option("--flat/--nested", default=False, help="Invoices in subdirectories?")
 @click.argument("path", type=click.Path(exists=True))
 @click.argument("account_key")
@@ -92,6 +100,9 @@ def auto_vat(vat_percentage, vat_in_acc, vat_out_acc):
 
 @cli.group()
 def show():
+    """
+    Show account saldo, journal or accounts.
+    """
     pass
 
 
