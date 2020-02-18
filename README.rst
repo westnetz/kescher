@@ -1,6 +1,16 @@
 kescher
 ========
 
+.. image:: https://circleci.com/gh/westnetz/kescher.svg?style=svg
+    :target: https://circleci.com/gh/westnetz/kescher
+    :alt: CircleCI Status
+.. image:: https://readthedocs.org/projects/kescher/badge/?version=latest
+    :target: https://kescher.readthedocs.io/en/latest/?badge=latest
+    :alt: Documentation Status
+.. image:: https://codecov.io/gh/westnetz/kescher/branch/develop/graph/badge.svg
+    :target: https://codecov.io/gh/westnetz/kescher
+    :alt: Coverage
+
 **kescher** is a simple accounting tool. 
 
 You can load in your bank statement, connect each booking
@@ -55,4 +65,3 @@ License
 -------
 
 GNU General Public License v3
-
