@@ -2,9 +2,17 @@ from decimal import Decimal
 from kescher.models import Account, JournalEntry
 
 
-def show_accounts():
-    for account in Account.select():
-        yield account
+def show_accounts(parent=None, layer=0):
+    """
+    Show the account tree.
+    """
+    if not parent:
+        accounts = Account.select().where(Account.parent.is_null())
+    else:
+        accounts = Account.select().where(Account.parent == parent)
+    for account in accounts:
+        yield "┃ " * layer + f"┣━{account.name}"
+        yield from show_accounts(parent=account, layer=layer + 1)
 
 
 def show_journal(filter_, width, header=True):
