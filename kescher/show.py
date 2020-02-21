@@ -1,5 +1,7 @@
-from decimal import Decimal
-from kescher.models import Account, JournalEntry
+import sys
+
+from kescher.helpers import Box
+from kescher.models import Account, JournalEntry, Booking
 
 
 def show_accounts(parent=None, layer=0):
@@ -15,49 +17,30 @@ def show_accounts(parent=None, layer=0):
         yield from show_accounts(parent=account, layer=layer + 1)
 
 
-def show_journal(filter_, width, header=True):
+def show_entry(entry_id):
     """
-    Selects the JournalEntries to be shown and yields them.
-    Filters can be given with column:filter_string as the first
-    argument. The width is the total width of a row, and therefore
-    is responsible for the amount of padding.
+    Fetch a JournalEntry and all corresponding bookings and return
+    them ready to be printed.
     """
-    column = None
-    subject_width = width - 54
-    columns = (
-        ("id", 3, "zfill"),
-        ("sender", 15, "ljust"),
-        ("receiver", 15, "ljust"),
-        ("subject", subject_width, "ljust"),
-        ("value", 9, "rjust"),
-        ("balance", 9, "rjust"),
-    )
+    entry = JournalEntry.get(JournalEntry.id == entry_id)
+    bookings = Booking.select().where(Booking.journalentry == entry)
+    return entry, bookings
 
-    if filter_:
-        filter_split = filter_.split("=")
-        if len(filter_split) != 2:
-            raise ValueError("Filter must contain exactly one '='")
-        column, filter_string = filter_split
-        if not hasattr(JournalEntry, column):
-            raise ValueError(f"{column} is not a filterable column")
 
-    if column:
-        selector = JournalEntry.select().where(
-            getattr(JournalEntry, column) == filter_string
-        )
-    else:
-        selector = JournalEntry.select()
+def show_table(filter_fct, filter_, width):
+    """
+    Print a table as a table.
+    """
+    box_helper = None
+    try:
+        for entry in filter_fct(filter_, width):
+            if not box_helper:
+                box_helper = Box([len(e) for e in entry])
+                print(box_helper.top())
+            else:
+                print(box_helper.center())
+            print(box_helper.content(entry))
+        print(box_helper.bottom())
 
-    if header:
-        yield [c[0].ljust(c[1]) for c in columns]
-
-    for je in selector:
-        line = []
-        for col, length, just in columns:
-            value = getattr(je, col)
-            if isinstance(value, Decimal):
-                value = round(value, 2)
-            element = str(value)[:length]
-            just_method = getattr(element, just)
-            line.append(just_method(length))
-        yield line
+    except ValueError as e:
+        sys.exit(e)

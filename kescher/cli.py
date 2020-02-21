@@ -2,20 +2,21 @@
 import arrow
 import click
 import logging
-import sys
 
 from kescher.booking import auto_book_vat, get_account_saldo
+from kescher.filters import JournalFilter
 from kescher.importers import (
     AccountImporter,
     DocumentImporter,
     InvoiceImporter,
     JournalImporter,
 )
-from kescher.helpers import Box
 from kescher.logging import setup_logging
 from kescher.models import create_tables
-from kescher.show import show_accounts, show_journal
+from kescher.show import show_accounts, show_table, show_entry
 from pathlib import Path
+
+DEFAULT_WIDTH = 80
 
 cwd = Path.cwd()
 logger = setup_logging(cwd)
@@ -122,21 +123,12 @@ def saldo(account, start_date, end_date):
 
 @show.command()
 @click.option("--filter", default=None)
-@click.option("--width", type=click.INT, default=80)
+@click.option("--width", type=click.INT, default=DEFAULT_WIDTH)
 def journal(filter, width):
-    box_helper = None
-    try:
-        for entry in show_journal(filter, width):
-            if not box_helper:
-                box_helper = Box([len(e) for e in entry])
-                print(box_helper.top())
-            else:
-                print(box_helper.center())
-            print(box_helper.content(entry))
-        print(box_helper.bottom())
-
-    except ValueError as e:
-        sys.exit(e)
+    """
+    Show all journal entries or filter by value.
+    """
+    show_table(JournalFilter(), filter, width)
 
 
 @show.command()
@@ -148,8 +140,21 @@ def accounts():
         print(acc)
 
 
-@cli.command()
-def init():
+@show.command()
+@click.option("--width", type=click.INT, default=DEFAULT_WIDTH)
+@click.argument("entry_id")
+def entry(width, entry_id):
+    """
+    Show a journal entry and all corresponding bookings.
+    """
+    entry, bookings = show_entry(entry_id)
+    show_table(JournalFilter(), f"id={entry_id}", width)
+    for booking in bookings:
+        print(f"\t{booking}")
+
+
+@cli.command("init")
+def initialize():
     """
     Create the database in the current working directory.
     """
