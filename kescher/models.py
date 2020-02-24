@@ -72,11 +72,13 @@ class JournalEntry(BaseModel):
     imported_at = DateTimeField()
 
     def __str__(self):
-        return f"{self.date} - \
-                 {self.sender[:10]} - \
-                 {self.receiver[:10]} - \
-                 {self.subject[:10]} - \
-                 {self.value}"
+        return (
+            f"{self.date} | "
+            + f"{self.sender[:10]} | "
+            + f"{self.receiver[:10]} | "
+            + f"{self.subject[:10]} | "
+            + f"{self.value}"
+        )
 
 
 class Account(BaseModel):
@@ -100,6 +102,14 @@ class Booking(BaseModel):
     journalentry = ForeignKeyField(JournalEntry, backref="account_entries")
     comment = CharField(null=True)
     value = DecimalField()
+
+    def __str__(self):
+        return (
+            f"{self.account} | "
+            + f"{self.journalentry} | "
+            + f"{self.comment} | "
+            + f"{self.value}"
+        )
 
 
 class VirtualBooking(BaseModel):
