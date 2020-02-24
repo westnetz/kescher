@@ -3,8 +3,9 @@ import arrow
 import click
 import logging
 
+from colorama import init, Fore
 from kescher.booking import auto_book_vat, get_account_saldo
-from kescher.filters import JournalFilter
+from kescher.filters import EntryFilter, JournalFilter
 from kescher.importers import (
     AccountImporter,
     DocumentImporter,
@@ -13,13 +14,14 @@ from kescher.importers import (
 )
 from kescher.logging import setup_logging
 from kescher.models import create_tables
-from kescher.show import show_accounts, show_table, show_entry
+from kescher.show import show_accounts, show_table
 from pathlib import Path
 
 DEFAULT_WIDTH = 80
 
 cwd = Path.cwd()
 logger = setup_logging(cwd)
+init(autoreset=True)
 
 
 @click.group()
@@ -147,10 +149,10 @@ def entry(width, entry_id):
     """
     Show a journal entry and all corresponding bookings.
     """
-    entry, bookings = show_entry(entry_id)
+    print(Fore.YELLOW + "Entry")
     show_table(JournalFilter(), f"id={entry_id}", width)
-    for booking in bookings:
-        print(f"\t{booking}")
+    print(Fore.YELLOW + "Bookings")
+    show_table(EntryFilter(), f"id={entry_id}", width)
 
 
 @cli.command("init")

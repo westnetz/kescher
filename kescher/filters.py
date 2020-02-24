@@ -1,5 +1,5 @@
 from decimal import Decimal
-from kescher.models import JournalEntry
+from kescher.models import Booking, JournalEntry
 
 
 class ModelFilter:
@@ -52,5 +52,20 @@ class JournalFilter(ModelFilter):
     )
 
     def __call__(self, filter_, width, header=True):
-        JournalFilter.columns[3][1] = width - 54
+        self.columns[3][1] = width - 54
+        yield from super().__call__(filter_, width, header)
+
+
+class EntryFilter(ModelFilter):
+
+    model = Booking
+    columns = (
+        ["id", 3, "zfill"],
+        ["account", 20, "ljust"],
+        ["comment", 20, "ljust"],
+        ["value", 9, "rjust"],
+    )
+
+    def __call__(self, filter_, width, header=True):
+        self.columns[2][1] = width - 33
         yield from super().__call__(filter_, width, header)

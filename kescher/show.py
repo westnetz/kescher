@@ -1,7 +1,7 @@
 import sys
 
 from kescher.helpers import Box
-from kescher.models import Account, JournalEntry, Booking
+from kescher.models import Account
 
 
 def show_accounts(parent=None, layer=0):
@@ -15,16 +15,6 @@ def show_accounts(parent=None, layer=0):
     for account in accounts:
         yield "┃ " * layer + f"┣━{account.name}"
         yield from show_accounts(parent=account, layer=layer + 1)
-
-
-def show_entry(entry_id):
-    """
-    Fetch a JournalEntry and all corresponding bookings and return
-    them ready to be printed.
-    """
-    entry = JournalEntry.get(JournalEntry.id == entry_id)
-    bookings = Booking.select().where(Booking.journalentry == entry)
-    return entry, bookings
 
 
 def show_table(filter_fct, filter_, width):
