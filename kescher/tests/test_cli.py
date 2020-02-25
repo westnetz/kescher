@@ -181,8 +181,8 @@ def test_show_journal_filtered(journal_filtered_klausi_meyer):
     assert result.exit_code == 0
     output = result.output.strip().split("\n")
     assert len(journal_filtered_klausi_meyer) == len(output)
-    for line in journal_filtered_klausi_meyer:
-        assert line in output
+    for line, exp in zip(output, journal_filtered_klausi_meyer):
+        assert line == exp
 
     # Check for empty result on non existing sender Klaus (instead of Klausi)
     result = runner.invoke(cli, ("show", "journal", "--filter", "sender=Klaus Meyer"))
@@ -232,9 +232,8 @@ def test_show_accounts(expected_accounts):
     result = runner.invoke(cli, ("show", "accounts"))
     assert result.exit_code == 0
     output = result.output.strip().split("\n")
-    for acc in expected_accounts:
-        assert acc in output
-    assert len(expected_accounts) == len(output)
+    for acc, exp in zip(output, expected_accounts):
+        assert acc == exp
 
 
 def test_show_entry(entry_3):
