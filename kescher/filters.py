@@ -1,6 +1,7 @@
 from decimal import Decimal
 from kescher.models import Booking, JournalEntry
 
+MIN_WIDTH = 61
 
 class ModelFilter:
 
@@ -52,6 +53,8 @@ class JournalFilter(ModelFilter):
     )
 
     def __call__(self, filter_, width, header=True):
+        if width <= MIN_WIDTH:
+            width = MIN_WIDTH
         self.columns[3][1] = width - 54
         yield from super().__call__(filter_, width, header)
 
@@ -67,5 +70,7 @@ class EntryFilter(ModelFilter):
     )
 
     def __call__(self, filter_, width, header=True):
+        if width <= MIN_WIDTH:
+            width = MIN_WIDTH
         self.columns[2][1] = width - 33
         yield from super().__call__(filter_, width, header)
