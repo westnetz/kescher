@@ -3,6 +3,7 @@ from kescher.models import Booking, JournalEntry
 
 MIN_WIDTH = 61
 
+
 class ModelFilter:
 
     columns = None

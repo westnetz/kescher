@@ -235,3 +235,17 @@ def test_show_accounts(expected_accounts):
     for acc in expected_accounts:
         assert acc in output
     assert len(expected_accounts) == len(output)
+
+
+def test_show_entry(entry_3):
+    """
+    Asserts, that the filter results matches expectations of content and formatting.
+    The called journalentry should be displayed in one table, and below all corresponding
+    entries.
+    """
+    runner = CliRunner()
+    result = runner.invoke(cli, ("show", "entry", "003", "--width=40"))
+    assert result.exit_code == 0
+    output = result.output.strip().split("\n")
+    for res, exp in zip(output, entry_3):
+        assert res == exp
