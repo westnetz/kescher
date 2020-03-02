@@ -23,8 +23,9 @@ check: flake ## Perform black and flake checks (Should be done pre-commit)
 
 .PHONY: docs
 docs:
-	rm -f docs/source/kescher.rst docs/source/modules.rst docs/source/kescher.tests.rst
-	sphinx-apidoc -o docs/source kescher
+	rm -f docs/kescher.rst
+	rm -f docs/modules.rst
+	sphinx-apidoc -o docs kescher
 	$(MAKE) -C docs clean
 	$(MAKE) -C docs html
 

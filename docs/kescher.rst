@@ -35,22 +35,6 @@ kescher.database module
    :undoc-members:
    :show-inheritance:
 
-kescher.filters module
-----------------------
-
-.. automodule:: kescher.filters
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-kescher.helpers module
-----------------------
-
-.. automodule:: kescher.helpers
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
 kescher.importers module
 ------------------------
 
@@ -79,14 +63,6 @@ kescher.sanitizers module
 -------------------------
 
 .. automodule:: kescher.sanitizers
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-kescher.show module
--------------------
-
-.. automodule:: kescher.show
    :members:
    :undoc-members:
    :show-inheritance:

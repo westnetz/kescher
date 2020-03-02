@@ -28,7 +28,7 @@ Getting started
    design
    installation
    quickstart
-   source/modules
+   modules
 
 * :ref:`genindex`
 * :ref:`modindex`
