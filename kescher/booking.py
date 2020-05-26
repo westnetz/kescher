@@ -43,6 +43,42 @@ def auto_book_vat(percentage, vat_in_acc, vat_out_acc):
             logger.debug(f"Added Booking of {booking_value} to {vat_out_acc}.")
 
 
+def book_entry(value, comment, journalentry_id, account_name):
+    """
+    Book a journalentry to some account.
+    """
+    logger = logging.getLogger("kescher.booking.auto_book_vat")
+    account = Account.get(Account.name == account_name)
+    journalentry = JournalEntry.get_by_id(journalentry_id)
+    booked = (
+        Booking.select(fn.SUM(Booking.value))
+        .where(Booking.journalentry == journalentry)
+        .scalar()
+    )
+
+    remaining = abs(journalentry.value) - Decimal(booked)
+    if not remaining:
+        raise ValueError("No remaining value to be booked")
+
+    # If no value is given the remaining value is booked (default),
+    # i.e. no split booking
+    if value is None:
+        value_to_book = remaining
+    else:
+        if value > remaining:
+            raise ValueError(f"Cannot book {value}, as only {remaining} is available.")
+        else:
+            value_to_book = value
+
+    logger.info(f"Booking {value} from of {journalentry.id} to {account.name}")
+
+    new_booking = Booking.create(
+        account=account, journalentry=journalentry, value=value_to_book, comment=comment
+    )
+
+    return new_booking
+
+
 def get_account_saldo(account, start_date, end_date):
     saldo = (
         Booking.select(fn.SUM(Booking.value))
@@ -56,4 +92,6 @@ def get_account_saldo(account, start_date, end_date):
         )
         .scalar()
     )
+    if saldo is None:
+        saldo = Decimal("0.0")
     return round(saldo, 2)

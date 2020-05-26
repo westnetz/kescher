@@ -199,10 +199,10 @@ def test_auto_vat():
     The results are checked separately with the show_saldo test command.
     """
     runner = CliRunner()
-    result = runner.invoke(cli, ("auto-vat", "19", "USt_Einnahmen", "USt_Ausgaben"))
+    result = runner.invoke(cli, ("book", "vat", "19", "USt_Einnahmen", "USt_Ausgaben"))
     assert result.exit_code == 0
     result_again = runner.invoke(
-        cli, ("auto-vat", "19", "USt_Einnahmen", "USt_Ausgaben")
+        cli, ("book", "vat", "19", "USt_Einnahmen", "USt_Ausgaben")
     )
     assert result_again.exit_code == 0
 
@@ -247,4 +247,18 @@ def test_show_entry(entry_3):
     assert result.exit_code == 0
     output = result.output.strip().split("\n")
     for res, exp in zip(output, entry_3):
+        assert res == exp
+
+
+def test_show_booked_entry(entry_3_booked):
+    """
+    Asserts, that after the remains of entry 3 where booked to one account, the journalentry
+    should display these bookings.
+    """
+    runner = CliRunner()
+    runner.invoke(cli, ("book", "entry", "3", "Strom"))
+    result = runner.invoke(cli, ("show", "entry", "003"))
+    assert result.exit_code == 0
+    output = result.output.strip().split("\n")
+    for res, exp in zip(output, entry_3_booked):
         assert res == exp
