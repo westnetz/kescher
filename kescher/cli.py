@@ -2,10 +2,15 @@
 import arrow
 import click
 import logging
+import sys
 
 from colorama import init, Fore
 from decimal import Decimal
-from kescher.booking import auto_book_vat, get_account_saldo
+from kescher.booking import (
+    auto_book_vat,
+    book_entry,
+    get_account_saldo,
+)
 from kescher.filters import EntryFilter, JournalFilter
 from kescher.importers import (
     AccountImporter,
@@ -112,7 +117,7 @@ def vat(vat_percentage, vat_in_acc, vat_out_acc):
     auto_book_vat(vat_percentage, vat_in_acc, vat_out_acc)
 
 
-@book.command()
+@book.command("entry")
 @click.option("--value", "-v", type=Decimal)
 @click.option("--comment", "-c")
 @click.argument("journalentry")
@@ -121,7 +126,10 @@ def entry(value, comment, journalentry, account):
     """
     Book the absolute value of the non-booked rest of a journalentry to the given account.
     """
-    print(type(value), comment, journalentry, account)
+    try:
+        book_entry(value, comment, journalentry, account)
+    except ValueError as e:
+        sys.exit(e)
 
 
 @cli.group()
@@ -165,17 +173,17 @@ def accounts():
         print(acc)
 
 
-@show.command()
+@show.command("entry")
 @click.option("--width", type=click.INT, default=DEFAULT_WIDTH)
 @click.argument("entry_id")
-def entry(width, entry_id):
+def show_entry(width, entry_id):
     """
     Show a journal entry and all corresponding bookings.
     """
     print(Fore.YELLOW + "Entry")
     show_table(JournalFilter(), f"id={entry_id}", width)
     print(Fore.YELLOW + "Bookings")
-    show_table(EntryFilter(), f"id={entry_id}", width)
+    show_table(EntryFilter(), f"journalentry_id={entry_id}", width)
 
 
 @cli.command("init")
