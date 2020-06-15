@@ -19,9 +19,10 @@ from kescher.importers import (
     JournalImporter,
 )
 from kescher.logging import setup_logging
-from kescher.models import create_tables
+from kescher.models import Account, create_tables
 from kescher.show import show_accounts, show_table
 from pathlib import Path
+from peewee import DoesNotExist
 
 DEFAULT_WIDTH = 80
 
@@ -193,3 +194,31 @@ def initialize():
     """
     print("Setting up database and directories...")
     create_tables()
+
+
+@cli.group()
+def create():
+    """
+    Create accounts
+    """
+    pass
+
+
+@create.command("account")
+@click.option("--parent", default=None)
+@click.argument("name")
+def create_account(parent, name):
+    parent_account = None
+    if parent:
+        try:
+            parent_account = Account.get(Account.name == parent)
+        except DoesNotExist:
+            sys.exit(f"Parent account {parent} not found.")
+    if parent_account:
+        new_acc = Account.get_or_create(name=name, parent=parent_account)
+    else:
+        new_acc = Account.get_or_create(name=name)
+    if new_acc[1]:
+        print(f"New account created: {new_acc[0]}")
+    else:
+        print(f"Account already exists: {new_acc[0]}")

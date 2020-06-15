@@ -89,6 +89,9 @@ class Account(BaseModel):
     name = CharField()
     parent = ForeignKeyField("self", null=True, backref="child_accounts")
 
+    class Meta:
+        indexes = ((("name", "parent"), True),)
+
     def __str__(self):
         return self.name
 
