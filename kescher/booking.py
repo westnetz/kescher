@@ -97,6 +97,8 @@ def get_account_saldo(account, start_date=None, end_date=None, with_virtual=Fals
     saldo = stmt.scalar()
     if saldo is None:
         saldo = Decimal("0.0")
+    else:
+        saldo = Decimal(saldo)
 
     if with_virtual:
         virtual_stmt = (
@@ -115,6 +117,8 @@ def get_account_saldo(account, start_date=None, end_date=None, with_virtual=Fals
         virtual_saldo = virtual_stmt.scalar()
         if virtual_saldo is None:
             virtual_saldo = Decimal("0.0")
+        else:
+            virtual_saldo = Decimal(virtual_saldo)
         return (round(saldo, 2), round(virtual_saldo, 2))
     else:
         return round(saldo, 2)

@@ -1,5 +1,6 @@
 import sys
 
+from kescher.booking import get_account_saldo
 from kescher.helpers import Box
 from kescher.models import Account
 
@@ -13,7 +14,8 @@ def show_accounts(parent=None, layer=0):
     else:
         accounts = Account.select().where(Account.parent == parent)
     for account in accounts:
-        yield "┃ " * layer + f"┣━{account.name}"
+        saldo, virtual_saldo = get_account_saldo(account.name, with_virtual=True)
+        yield (layer, account.name, saldo, virtual_saldo)
         yield from show_accounts(parent=account, layer=layer + 1)
 
 

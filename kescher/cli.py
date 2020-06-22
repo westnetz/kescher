@@ -132,6 +132,7 @@ def entry(value, comment, force, journalentry, account):
         book_entry(value, comment, journalentry, account, force)
     except ValueError as e:
         sys.exit(e)
+    show_entry(journalentry)
 
 
 @cli.group()
@@ -189,8 +190,16 @@ def accounts():
     """
     List all known accounts
     """
-    for acc in show_accounts():
-        print(acc)
+    for layer, name, saldo, virtual_saldo in show_accounts():
+        if not virtual_saldo:
+            real_saldo = saldo
+        else:
+            real_saldo = -saldo - virtual_saldo
+        if real_saldo < 0:
+            print_saldo = Fore.RED + str(real_saldo)
+        else:
+            print_saldo = Fore.GREEN + str(real_saldo)
+        print("┃ " * layer + f"┣━{name} {print_saldo}")
 
 
 @show.command("entry")
