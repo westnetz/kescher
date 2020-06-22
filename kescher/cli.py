@@ -11,7 +11,7 @@ from kescher.booking import (
     book_entry,
     get_account_saldo,
 )
-from kescher.filters import BookingFilter, JournalFilter
+from kescher.filters import BookingFilter, JournalFilter, VirtualBookingFilter
 from kescher.importers import (
     AccountImporter,
     DocumentImporter,
@@ -139,6 +139,21 @@ def show():
     Show account saldo, journal or accounts.
     """
     pass
+
+
+@show.command("account")
+@click.argument("account")
+@click.option("--width", type=click.INT, default=DEFAULT_WIDTH)
+def show_account(account, width):
+    acc = Account.get(Account.name == account)
+    print(Fore.YELLOW + "Bookings")
+    show_table(BookingFilter(), f"account_id={acc.id}", width)
+    print(Fore.YELLOW + "VirtualBookings")
+    show_table(VirtualBookingFilter(), f"account_id={acc.id}", width)
+    print(Fore.YELLOW + "Saldo")
+    saldo, virtual_saldo = get_account_saldo(account, with_virtual=True)
+    print(f"Booking saldo:\t\t{saldo}")
+    print(f"VirtualBooking saldo:\t{virtual_saldo}")
 
 
 @show.command()

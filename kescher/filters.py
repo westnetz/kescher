@@ -1,5 +1,5 @@
 from decimal import Decimal
-from kescher.models import Booking, JournalEntry
+from kescher.models import Booking, JournalEntry, VirtualBooking
 
 MIN_WIDTH = 61
 
@@ -27,11 +27,11 @@ class ModelFilter:
             selector = self.model.select()
 
         if header:
-            yield [c[0].ljust(c[1]) for c in self.columns]
+            yield [c[3].ljust(c[1]) for c in self.columns]
 
         for je in selector:
             line = []
-            for col, length, just in self.columns:
+            for col, length, just, name in self.columns:
                 value = getattr(je, col)
                 if isinstance(value, Decimal):
                     value = round(value, 2)
@@ -45,12 +45,12 @@ class JournalFilter(ModelFilter):
 
     model = JournalEntry
     columns = (
-        ["id", 3, "zfill"],
-        ["sender", 15, "ljust"],
-        ["receiver", 15, "ljust"],
-        ["subject", 36, "ljust"],
-        ["value", 9, "rjust"],
-        ["balance", 9, "rjust"],
+        ["id", 3, "zfill", "ID"],
+        ["sender", 15, "ljust", "Sender"],
+        ["receiver", 15, "ljust", "Receiver"],
+        ["subject", 36, "ljust", "Subject"],
+        ["value", 9, "rjust", "Value"],
+        ["balance", 9, "rjust", "Balance"],
     )
 
     def __call__(self, filter_, width, header=True):
@@ -60,14 +60,32 @@ class JournalFilter(ModelFilter):
         yield from super().__call__(filter_, width, header)
 
 
-class EntryFilter(ModelFilter):
+class BookingFilter(ModelFilter):
 
     model = Booking
     columns = (
-        ["id", 3, "zfill"],
-        ["account", 20, "ljust"],
-        ["comment", 20, "ljust"],
-        ["value", 9, "rjust"],
+        ["id", 3, "zfill", "ID"],
+        ["account", 20, "ljust", "Account"],
+        ["journalentry_id", 5, "zfill", "Entry"],
+        ["comment", 20, "ljust", "Comment"],
+        ["value", 9, "rjust", "Value"],
+    )
+
+    def __call__(self, filter_, width, header=True):
+        if width <= MIN_WIDTH:
+            width = MIN_WIDTH
+        self.columns[3][1] = width - 39
+        yield from super().__call__(filter_, width, header)
+
+
+class VirtualBookingFilter(ModelFilter):
+
+    model = VirtualBooking
+    columns = (
+        ["id", 3, "zfill", "ID"],
+        ["account", 20, "ljust", "Account"],
+        ["comment", 20, "ljust", "Comment"],
+        ["value", 9, "rjust", "Value"],
     )
 
     def __call__(self, filter_, width, header=True):
