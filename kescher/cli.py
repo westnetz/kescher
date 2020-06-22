@@ -11,7 +11,7 @@ from kescher.booking import (
     book_entry,
     get_account_saldo,
 )
-from kescher.filters import EntryFilter, JournalFilter
+from kescher.filters import BookingFilter, JournalFilter
 from kescher.importers import (
     AccountImporter,
     DocumentImporter,
@@ -184,7 +184,7 @@ def show_entry(width, entry_id):
     print(Fore.YELLOW + "Entry")
     show_table(JournalFilter(), f"id={entry_id}", width)
     print(Fore.YELLOW + "Bookings")
-    show_table(EntryFilter(), f"journalentry_id={entry_id}", width)
+    show_table(BookingFilter(), f"journalentry_id={entry_id}", width)
 
 
 @cli.command("init")
