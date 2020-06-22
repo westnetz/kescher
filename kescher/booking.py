@@ -65,7 +65,7 @@ def book_entry(value, comment, journalentry_id, account_name, force):
     if value is None:
         value_to_book = remaining
     else:
-        if value > remaining:
+        if value > remaining and not force:
             raise ValueError(f"Cannot book {value}, as only {remaining} is available.")
         else:
             value_to_book = value
