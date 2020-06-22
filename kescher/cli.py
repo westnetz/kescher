@@ -121,14 +121,15 @@ def vat(vat_percentage, vat_in_acc, vat_out_acc):
 @book.command("entry")
 @click.option("--value", "-v", type=Decimal)
 @click.option("--comment", "-c")
+@click.option("--force", is_flag=True, default=False)
 @click.argument("journalentry")
 @click.argument("account")
-def entry(value, comment, journalentry, account):
+def entry(value, comment, force, journalentry, account):
     """
     Book the absolute value of the non-booked rest of a journalentry to the given account.
     """
     try:
-        book_entry(value, comment, journalentry, account)
+        book_entry(value, comment, journalentry, account, force)
     except ValueError as e:
         sys.exit(e)
 
@@ -158,15 +159,18 @@ def show_account(account, width):
 
 @show.command()
 @click.argument("account")
-@click.argument("start_date")
-@click.argument("end_date")
-def saldo(account, start_date, end_date):
+@click.option("--start", default=None)
+@click.option("--end", default=None)
+@click.option("--with-virtual", default=False)
+def saldo(account, start, end, with_virtual):
     """
     Sum account bookings for given time frame.
     """
-    start = arrow.get(start_date)
-    end = arrow.get(end_date)
-    saldo = get_account_saldo(account, start, end)
+    if start is not None:
+        start = arrow.get(start)
+    if end is not None:
+        end = arrow.get(end)
+    saldo = get_account_saldo(account, start, end, with_virtual)
     print(f"Saldo is {saldo}")
 
 

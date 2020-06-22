@@ -43,7 +43,7 @@ def auto_book_vat(percentage, vat_in_acc, vat_out_acc):
             logger.debug(f"Added Booking of {booking_value} to {vat_out_acc}.")
 
 
-def book_entry(value, comment, journalentry_id, account_name):
+def book_entry(value, comment, journalentry_id, account_name, force):
     """
     Book a journalentry to some account.
     """
@@ -57,7 +57,7 @@ def book_entry(value, comment, journalentry_id, account_name):
     )
 
     remaining = abs(journalentry.value) - Decimal(booked)
-    if not remaining:
+    if not remaining and not force:
         raise ValueError("No remaining value to be booked")
 
     # If no value is given the remaining value is booked (default),
@@ -93,7 +93,7 @@ def get_account_saldo(account, start_date=None, end_date=None, with_virtual=Fals
             & (JournalEntry.date <= end_date.datetime)
         )
     else:
-        stmt = stmt.where((Account.name == account))
+        stmt = stmt.where(Account.name == account)
     saldo = stmt.scalar()
     if saldo is None:
         saldo = Decimal("0.0")
@@ -114,7 +114,7 @@ def get_account_saldo(account, start_date=None, end_date=None, with_virtual=Fals
             virtual_stmt = virtual_stmt.where((Account.name == account))
         virtual_saldo = virtual_stmt.scalar()
         if virtual_saldo is None:
-            saldo = Decimal("0.0")
+            virtual_saldo = Decimal("0.0")
         return (round(saldo, 2), round(virtual_saldo, 2))
     else:
         return round(saldo, 2)

@@ -213,13 +213,20 @@ def test_show_saldo():
     """
     runner = CliRunner()
     result_in = runner.invoke(
-        cli, ("show", "saldo", "USt_Einnahmen", "2020-01-01", "2020-03-31")
+        cli,
+        (
+            "show",
+            "saldo",
+            "USt_Einnahmen",
+            "--start",
+            "2020-01-01",
+            "--end",
+            "2020-03-31",
+        ),
     )
     assert result_in.exit_code == 0
     assert result_in.output.strip() == "Saldo is 18.52"
-    result_out = runner.invoke(
-        cli, ("show", "saldo", "USt_Ausgaben", "2020-01-01", "2020-03-31")
-    )
+    result_out = runner.invoke(cli, ("show", "saldo", "USt_Ausgaben"))
     assert result_out.exit_code == 0
     assert result_out.output.strip() == "Saldo is 29.48"
 
