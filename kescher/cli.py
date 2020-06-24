@@ -122,9 +122,10 @@ def vat(vat_percentage, vat_in_acc, vat_out_acc):
 @click.option("--value", "-v", type=Decimal)
 @click.option("--comment", "-c")
 @click.option("--force", is_flag=True, default=False)
+@click.option("--width", type=click.INT, default=DEFAULT_WIDTH)
 @click.argument("journalentry")
 @click.argument("account")
-def entry(value, comment, force, journalentry, account):
+def entry(value, comment, force, width, journalentry, account):
     """
     Book the absolute value of the non-booked rest of a journalentry to the given account.
     """
@@ -132,7 +133,10 @@ def entry(value, comment, force, journalentry, account):
         book_entry(value, comment, journalentry, account, force)
     except ValueError as e:
         sys.exit(e)
-    show_entry(journalentry)
+    print(Fore.YELLOW + "Entry")
+    show_table(JournalFilter(), f"id={journalentry}", width)
+    print(Fore.YELLOW + "Bookings")
+    show_table(BookingFilter(), f"journalentry_id={journalentry}", width)
 
 
 @cli.group()
