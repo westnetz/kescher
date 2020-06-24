@@ -80,6 +80,39 @@ def book_entry(value, comment, journalentry_id, account_name, force):
 
 
 def get_account_saldo(account, start_date=None, end_date=None, with_virtual=False):
+    """
+    Sums all bookings for the given account in the given timeframe to return 1
+    decimal (or two, if also the virtual bookings shall be considered).
+
+    If the selected account is parent to other accounts, the total of all child
+    accounts will be returned.
+    """
+    acc = Account.get(Account.name == account)
+
+    child_saldo_stmt = (
+        Booking.select(fn.SUM(Booking.value))
+        .join(Account)
+        .switch(Booking)
+        .where(Account.parent == acc)
+    )
+    child_saldo = child_saldo_stmt.scalar()
+
+    if with_virtual:
+        child_virtual_saldo_stmt = (
+            VirtualBooking.select(fn.SUM(VirtualBooking.value))
+            .join(Account)
+            .switch(VirtualBooking)
+            .where(Account.parent == acc)
+        )
+        child_virtual_saldo = child_virtual_saldo_stmt.scalar()
+        if child_virtual_saldo is not None and child_saldo is not None:
+            print(child_saldo, child_virtual_saldo)
+            return (round(child_saldo, 2), round(child_virtual_saldo, 2))
+    else:
+        if child_saldo is not None:
+            return round(child_saldo, 2)
+
+
     stmt = (
         Booking.select(fn.SUM(Booking.value))
         .join(Account)
