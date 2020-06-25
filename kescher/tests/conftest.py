@@ -6,7 +6,7 @@ EXPECTED_ACCOUNTS = (
     "┃ ┣━1000 \x1b[31m-240.00",
     "┃ ┣━1001 \x1b[32m0.00",
     "┃ ┣━1002 \x1b[32m0.00",
-    "┣━Umsatzsteuer \x1b[32m0.00",
+    "┣━Umsatzsteuer \x1b[32m48.0",
     "┃ ┣━USt_Einnahmen \x1b[32m18.52",
     "┃ ┣━USt_Ausgaben \x1b[32m29.48",
     "┣━Aufwendungen \x1b[32m0.00",

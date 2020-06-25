@@ -105,13 +105,13 @@ def get_account_saldo(account, start_date=None, end_date=None, with_virtual=Fals
             .where(Account.parent == acc)
         )
         child_virtual_saldo = child_virtual_saldo_stmt.scalar()
-        if child_virtual_saldo is not None and child_saldo is not None:
-            print(child_saldo, child_virtual_saldo)
+        if child_saldo is not None:
+            if child_virtual_saldo is None:
+                child_virtual_saldo = 0.0
             return (round(child_saldo, 2), round(child_virtual_saldo, 2))
     else:
         if child_saldo is not None:
             return round(child_saldo, 2)
-
 
     stmt = (
         Booking.select(fn.SUM(Booking.value))
