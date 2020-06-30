@@ -55,7 +55,8 @@ def book_entry(value, comment, journalentry_id, account_name, force):
         .where(Booking.journalentry == journalentry)
         .scalar()
     )
-
+    if booked is None:
+        booked = Decimal("0.0")
     remaining = abs(journalentry.value) - Decimal(booked)
     if not remaining and not force:
         raise ValueError("No remaining value to be booked")
