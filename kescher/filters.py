@@ -1,5 +1,6 @@
 from decimal import Decimal
 from kescher.models import Booking, JournalEntry, VirtualBooking
+from peewee import fn
 
 MIN_WIDTH = 61
 
@@ -93,3 +94,56 @@ class VirtualBookingFilter(ModelFilter):
             width = MIN_WIDTH
         self.columns[2][1] = width - 33
         yield from super().__call__(filter_, width, header)
+
+
+class UnbalancedFilter:
+
+    columns = (
+        ["id", 3, "zfill", "ID"],
+        ["sender", 15, "ljust", "Sender"],
+        ["receiver", 15, "ljust", "Receiver"],
+        ["subject", 36, "ljust", "Subject"],
+        ["value", 9, "rjust", "Value"],
+        ["bookings", 9, "rjust", "Bookings"],
+    )
+
+    def __call__(self, filter_, width, header=True):
+        if width <= MIN_WIDTH:
+            width = MIN_WIDTH
+        self.columns[3][1] = width - 54
+
+        if header:
+            yield [c[3].ljust(c[1]) for c in self.columns]
+        selector = (
+            JournalEntry.select(
+                JournalEntry.id,
+                JournalEntry.sender,
+                JournalEntry.receiver,
+                JournalEntry.subject,
+                JournalEntry.value,
+                fn.SUM(Booking.value).alias("bookings"),
+            )
+            .join(Booking)
+            .group_by(JournalEntry)
+            .having(fn.SUM(Booking.value) > 0)
+        )
+
+        for je in selector:
+            line = []
+            for col, length, just, name in self.columns:
+                value = getattr(je, col)
+                if isinstance(value, Decimal):
+                    value = round(value, 2)
+                element = str(value)[:length]
+                just_method = getattr(element, just)
+                line.append(just_method(length))
+            yield line
+
+
+# SELECT journalentry.id, SUM(booking.value) as saldo FROM journalentry
+#        LEFT JOIN booking
+#        ON journalentry.id = booking.journalentry_id
+#        GROUP BY journalentry.id
+#        HAVING SUM(booking.value) > 0
+#        ORDER BY SUM(booking.value) DESC;
+#

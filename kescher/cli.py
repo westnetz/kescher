@@ -11,7 +11,12 @@ from kescher.booking import (
     book_entry,
     get_account_saldo,
 )
-from kescher.filters import BookingFilter, JournalFilter, VirtualBookingFilter
+from kescher.filters import (
+    BookingFilter,
+    JournalFilter,
+    UnbalancedFilter,
+    VirtualBookingFilter,
+)
 from kescher.importers import (
     AccountImporter,
     DocumentImporter,
@@ -187,6 +192,15 @@ def journal(filter, width):
     Show all journal entries or filter by value.
     """
     show_table(JournalFilter(), filter, width)
+
+
+@show.command()
+@click.option("--width", type=click.INT, default=DEFAULT_WIDTH)
+def unbalanced(width):
+    """
+    Show journal entries where added bookings do not add up to zero.
+    """
+    show_table(UnbalancedFilter(), None, width)
 
 
 @show.command()
